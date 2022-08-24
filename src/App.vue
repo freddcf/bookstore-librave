@@ -2,9 +2,9 @@
   <v-app>
     <Navbar />
 
-    <v-content>
+    <v-main class="c600">
       <router-view/>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
