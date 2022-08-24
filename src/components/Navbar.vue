@@ -5,7 +5,6 @@
                 <v-img 
                     height="31"
                     :src="logo"
-                    aspect-ratio="1"
                 ></v-img>
             </v-toolbar-title>
 
