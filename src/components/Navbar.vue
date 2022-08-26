@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <v-app-bar flat app color="c400 c100--text px-10">
+    <v-app-bar flat app color="c400 c100--text">
       <v-app-bar-title>
         <v-img height="31" :src="logo"></v-img>
       </v-app-bar-title>
@@ -85,16 +85,17 @@ export default {
 </script>
 
 <style scoped>
+.v-app-bar {
+  padding: 0 100px;
+}
 .v-btn {
   border-bottom: 3px solid transparent !important;
   transition: all 0.3s;
 }
-
 .v-btn.activated-btn {
   border-bottom: 3px solid #02af8e !important;
   transition: all 0.3s;
 }
-
 .activated-btn.v-btn::before {
   display: none;
 }
