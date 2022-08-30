@@ -1,10 +1,11 @@
 <template>
-  <div class="table">
+  <div class="py-6 table d-flex justify-center">
     <v-data-table
       class="px-8 py-8"
       :headers="headers"
-      :items="desserts"
+      :items="publishers"
       :search="search"
+      :items-per-page="5"
     >
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
@@ -35,34 +36,24 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.name"
-                        label="Dessert name"
+                        label="Publisher name"
+                        append-icon="mdi-book-open-page-variant-outline"
+                        :rules="rules"
+                        counter
+                        maxlength="25"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.calories"
-                        label="Calories"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.fat"
-                        label="Fat (g)"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.carbs"
-                        label="Carbs (g)"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.protein"
-                        label="Protein (g)"
+                        v-model="editedItem.city"
+                        label="Publisher city"
+                        append-icon="mdi-city-variant-outline"
+                        :rules="rules"
+                        counter
+                        maxlength="20"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -71,10 +62,10 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
+                <v-btn color="error" text @click="close">
                   Cancel
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+                <v-btn color="primary" text @click="save"> Save </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -101,6 +92,7 @@
             class="searchInput"
             v-model="search"
             label="Pesquisar"
+            color="c500"
             clearable
             outlined
             dense
@@ -110,9 +102,9 @@
 
       <template v-slot:[`item.actions`]="{ item }">
         <v-btn
-          dark
+          outlined
           color="c800"
-          class="rounded-md px-0 mr-2"
+          class="tableBtn blueBtn rounded-md px-0 mr-2"
           min-width="30"
           height="30"
           @click="editItem(item)"
@@ -120,9 +112,9 @@
           <PhNotePencil size="25" weight="bold" />
         </v-btn>
         <v-btn
-          dark
+          outlined
           color="c900"
-          class="rounded-md px-0"
+          class="tableBtn redBtn rounded-md px-0"
           min-width="30"
           height="30"
           @click="deleteItem(item)"
@@ -145,48 +137,41 @@ export default {
   name: 'PublisherView',
   components: {
     PhPlus,
-    PhNotePencil, 
-    PhTrash, 
-    PhBookmarksSimple
+    PhNotePencil,
+    PhTrash,
+    PhBookmarksSimple,
   },
   data: () => ({
     search: '',
     dialog: false,
     dialogDelete: false,
+    rules: [v => v.length <= 25 || 'Max 25 characters'],
     headers: [
       {
-        text: 'Dessert (100g serving)',
+        text: 'ID',
         align: 'start',
         sortable: false,
-        value: 'name',
+        value: 'id',
       },
-      { text: 'Calories', value: 'calories' },
-      { text: 'Fat (g)', value: 'fat' },
-      { text: 'Carbs (g)', value: 'carbs' },
-      { text: 'Protein (g)', value: 'protein' },
+      { text: 'Nome', value: 'name' },
+      { text: 'Cidade', value: 'city' },
       { text: 'Ações', value: 'actions', sortable: false },
     ],
-    desserts: [],
+    publishers: [],
     editedIndex: -1,
     editedItem: {
       name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      city: '',
     },
     defaultItem: {
       name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      city: '',
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
+      return this.editedIndex === -1 ? 'Nova editora' : 'Editar editora';
     },
   },
 
@@ -205,94 +190,74 @@ export default {
 
   methods: {
     initialize() {
-      this.desserts = [
+      this.publishers = [
         {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
+          id: 1,
+          name: 'Saraiva',
+          city: 'Fortaleza',
         },
         {
+          id: 2,
           name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
+          city: 'Fortaleza',
         },
         {
+          id: 3,
           name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
+          city: 'Fortaleza',
         },
         {
+          id: 4,
           name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
+          city: 'Fortaleza',
         },
         {
+          id: 5,
           name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
+          city: 'Fortaleza',
         },
         {
+          id: 6,
           name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
+          city: 'Fortaleza',
         },
         {
+          id: 7,
           name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
+          city: 'Fortaleza',
         },
         {
+          id: 8,
           name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
+          city: 'Fortaleza',
         },
         {
+          id: 9,
           name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
+          city: 'Fortaleza',
         },
         {
+          id: 10,
           name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
+          city: 'Fortaleza',
         },
       ];
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.publishers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.publishers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.publishers.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -314,9 +279,9 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        Object.assign(this.publishers[this.editedIndex], this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
+        this.publishers.push(this.editedItem);
       }
       this.close();
     },
@@ -324,12 +289,9 @@ export default {
 };
 </script>
 
-<style>
-.table {
-  padding: 30px 100px;
-}
+<style scoped>
 .v-data-table {
-  border: 3px solid #1d3245;
+  width: 800px;
 }
 .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   font-size: 16px;
@@ -346,24 +308,27 @@ export default {
   border-radius: 10px;
   border-color: #1d3245 !important;
 }
-.v-text-field--outlined fieldset {
+.v-text-field--outlined {
   color: #1d3245 !important;
 }
-.v-text-field__details {
+
+/* broken */
+div.v-input__control div.v-text-field__details {
   display: none;
 }
-.v-text-field.searchInput.v-input {
-  width: 0px;
-}
-.v-text-field.searchInput div.v-text-field__details {
-  display: none;
-}
+/* broken */
 
 .v-card .v-card-title {
   margin: 40px;
 }
-.v-card {
-  border-radius: 10px;
-  border: 3px solid #1d3245;
+
+.tableBtn {
+  border-width: 2px;
+}
+.tableBtn.blueBtn {
+  background: rgba(53, 207, 255, 0.2) !important;
+}
+.tableBtn.redBtn {
+  background: rgba(222, 24, 63, 0.2) !important;
 }
 </style>
