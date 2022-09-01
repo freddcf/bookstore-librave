@@ -54,7 +54,7 @@
         to="/rental"
       >
         <PhNotepad size="22" />
-        Notepad
+        Aluguel
       </v-btn>
     </v-app-bar>
   </nav>

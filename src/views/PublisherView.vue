@@ -1,7 +1,7 @@
 <template>
   <div class="py-6 table d-flex justify-center">
     <v-data-table
-      class="px-8 py-8"
+      class="px-8 py-8 dataTable"
       :headers="headers"
       :items="publishers"
       :search="search"
@@ -41,7 +41,6 @@
                         v-model="editedItem.name"
                         label="Publisher name"
                         append-icon="mdi-book-open-page-variant-outline"
-                        :rules="rules"
                         counter
                         maxlength="25"
                       ></v-text-field>
@@ -51,7 +50,6 @@
                         v-model="editedItem.city"
                         label="Publisher city"
                         append-icon="mdi-city-variant-outline"
-                        :rules="rules"
                         counter
                         maxlength="20"
                       ></v-text-field>
@@ -62,10 +60,8 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="primary" text @click="save"> Save </v-btn>
+                <v-btn color="error" text @click="close"> Cancelar </v-btn>
+                <v-btn color="primary" text @click="save"> Salvar </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -77,7 +73,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancel</v-btn
+                  >Cancelar</v-btn
                 >
                 <v-btn color="blue darken-1" text @click="deleteItemConfirm"
                   >OK</v-btn
@@ -126,12 +122,11 @@
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
     </v-data-table>
-    <PhBookmarksSimple />
   </div>
 </template>
 
 <script>
-import { PhPlus, PhNotePencil, PhTrash, PhBookmarksSimple } from 'phosphor-vue';
+import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
 
 export default {
   name: 'PublisherView',
@@ -139,31 +134,26 @@ export default {
     PhPlus,
     PhNotePencil,
     PhTrash,
-    PhBookmarksSimple,
   },
   data: () => ({
     search: '',
     dialog: false,
     dialogDelete: false,
-    rules: [v => v.length <= 25 || 'Max 25 characters'],
     headers: [
-      {
-        text: 'ID',
-        align: 'start',
-        sortable: false,
-        value: 'id',
-      },
+      { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
       { text: 'Cidade', value: 'city' },
-      { text: 'Ações', value: 'actions', sortable: false },
+      { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
     publishers: [],
     editedIndex: -1,
     editedItem: {
+      id: 0,
       name: '',
       city: '',
     },
     defaultItem: {
+      id: 0,
       name: '',
       city: '',
     },
@@ -290,45 +280,7 @@ export default {
 </script>
 
 <style scoped>
-.v-data-table {
+.dataTable {
   width: 800px;
-}
-.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  font-size: 16px;
-}
-.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-  font-size: 15px;
-}
-.v-data-footer {
-  font-size: 15px;
-}
-
-.theme--light.v-divider {
-  border-width: 2px;
-  border-radius: 10px;
-  border-color: #1d3245 !important;
-}
-.v-text-field--outlined {
-  color: #1d3245 !important;
-}
-
-/* broken */
-div.v-input__control div.v-text-field__details {
-  display: none;
-}
-/* broken */
-
-.v-card .v-card-title {
-  margin: 40px;
-}
-
-.tableBtn {
-  border-width: 2px;
-}
-.tableBtn.blueBtn {
-  background: rgba(53, 207, 255, 0.2) !important;
-}
-.tableBtn.redBtn {
-  background: rgba(222, 24, 63, 0.2) !important;
 }
 </style>

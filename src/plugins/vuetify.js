@@ -12,7 +12,7 @@ export default new Vuetify({
         c400: '#1D3245',
         c500: '#49C9A8',
         c600: '#02AF8E',
-        c700: '#FF5555',
+        c700: '#FF7E55',
         c800: '#35CFFF',
         c900: '#DE183F',
       },
