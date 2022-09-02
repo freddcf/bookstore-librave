@@ -36,6 +36,26 @@
               <v-card-text>
                 <v-container>
                   <v-row v-if="editedIndex === -1">
+                    <v-col class="d-flex pb-0" cols="12">
+                      <v-select
+                        :items="books"
+                        item-text="name"
+                        item-value="id"
+                        v-model="editedItem.book"
+                        append-icon="mdi-book-open-page-variant"
+                        label="Nome do livro"
+                      ></v-select>
+                    </v-col>
+                    <v-col class="d-flex pb-0" cols="12">
+                      <v-select
+                        :items="users"
+                        item-text="name"
+                        item-value="id"
+                        v-model="editedItem.user"
+                        append-icon="mdi-account"
+                        label="Nome do usuário"
+                      ></v-select>
+                    </v-col>
                     <v-col cols="12" class="pb-0">
                       <v-menu
                         v-model="modal"
@@ -146,15 +166,17 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-text-field
-            class="searchInput"
-            v-model="search"
-            label="Pesquisar"
-            color="c500"
-            clearable
-            outlined
-            dense
-          ></v-text-field>
+          <v-col class="d-flex pb-0" cols="12" md="5">
+            <v-text-field
+              class="searchInput"
+              v-model="search"
+              label="Pesquisar"
+              color="c500"
+              clearable
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
         </v-toolbar>
       </template>
 
@@ -214,8 +236,8 @@ export default {
     modal3: false,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
-      { text: 'Livro', value: 'bookName' },
-      { text: 'Usuário', value: 'userName' },
+      { text: 'Livro', value: 'book' },
+      { text: 'Usuário', value: 'user' },
       {
         text: 'Aluguel',
         value: 'rentalDate',
@@ -237,19 +259,21 @@ export default {
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
     rentals: [],
+    books: [],
+    users: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
-      userName: '',
-      bookName: '',
+      user: '',
+      book: '',
       rentalDate: '',
       returnForecast: '',
       returnDate: '',
     },
     defaultItem: {
       id: 0,
-      userName: '',
-      bookName: '',
+      user: '',
+      book: '',
       rentalDate: '',
       returnForecast: '',
       returnDate: '',
@@ -280,43 +304,127 @@ export default {
       this.rentals = [
         {
           id: 1,
-          userName: 'Fred Fonseca',
-          bookName: 'Como ficar rico',
+          user: 'Fred Fonseca',
+          book: 'Como ficar rico',
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: 'Não devolvido',
         },
         {
           id: 2,
-          userName: 'Caio',
-          bookName: 'Teste01',
+          user: 'Caio',
+          book: 'Teste01',
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: 'Não devolvido',
         },
         {
           id: 3,
-          userName: 'Luc',
-          bookName: 'Teste 02',
+          user: 'Luc',
+          book: 'Teste 02',
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: '28/05/2021 (Com atraso)',
         },
         {
           id: 4,
-          userName: 'Tiago',
-          bookName: 'Java e talz',
+          user: 'Tiago',
+          book: 'Java e talz',
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: '28/05/2021 (No prazo)',
         },
         {
           id: 5,
-          userName: 'Jonas',
-          bookName: 'Vue Js',
+          user: 'Jonas',
+          book: 'Vue Js',
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: 'Não devolvido',
+        },
+      ];
+      this.books = [
+        {
+          id: 1,
+          name: 'Spring Security',
+          quantity: 20,
+          rentedQuantity: 9,
+          launchDate: '18/11/2020',
+          author: 'Ingred Soares',
+          publisher: 'Saraiva',
+        },
+        {
+          id: 2,
+          name: 'Java pra nois',
+          quantity: 10,
+          rentedQuantity: 11,
+          launchDate: '12/10/2019',
+          author: 'Luiz Guilherme',
+          publisher: 'Saraiva',
+        },
+        {
+          id: 3,
+          name: 'Laravel de todes',
+          quantity: 70,
+          rentedQuantity: 9,
+          launchDate: '18/11/2020',
+          author: 'Sem criatividade',
+          publisher: 'Saraiva',
+        },
+        {
+          id: 4,
+          name: 'Go Lang',
+          quantity: 100,
+          rentedQuantity: 56,
+          launchDate: '06/05/2021',
+          author: 'Edsu',
+          publisher: 'Saraiva',
+        },
+        {
+          id: 5,
+          name: 'Viu JotaEsi',
+          quantity: 67,
+          rentedQuantity: 24,
+          launchDate: '18/11/2018',
+          author: 'Pedro Edro',
+          publisher: 'Saraiva',
+        },
+      ];
+      this.users = [
+        {
+          id: 1,
+          name: 'Saraiva',
+          city: 'Fortaleza',
+          email: 'sasa@gmail.com',
+          address: 'Rua 243, 54',
+        },
+        {
+          id: 2,
+          name: 'Ice cream sandwich',
+          city: 'Fortaleza',
+          email: 'iceii@gmail.com',
+          address: 'Avenida olimpio, 100',
+        },
+        {
+          id: 3,
+          name: 'Eclair',
+          city: 'Fortaleza',
+          email: 'ecate@gmail.com',
+          address: 'Rua Savio Freitas, 435',
+        },
+        {
+          id: 4,
+          name: 'Cupcake',
+          city: 'Fortaleza',
+          email: 'cupcup@gmail.com',
+          address: 'Avenida Dom Luís 282',
+        },
+        {
+          id: 5,
+          name: 'Gingerbread',
+          city: 'Fortaleza',
+          email: 'gi@gmail.com',
+          address: 'Posto Ipiranga',
         },
       ];
     },

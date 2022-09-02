@@ -56,21 +56,22 @@
                     </v-col>
                     <v-col cols="12" class="pb-0">
                       <v-text-field
-                        v-model="editedItem.publisherName"
-                        label="Nome da editora"
-                        append-icon="mdi-bookshelf"
-                        counter
-                        maxlength="20"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" class="pb-0">
-                      <v-text-field
                         v-model="editedItem.quantity"
                         label="Quantidade de livros"
                         append-icon="mdi-book-plus-multiple-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>
+                    </v-col>
+                    <v-col class="d-flex pb-0" cols="12">
+                      <v-select
+                        :items="publishers"
+                        item-text="name"
+                        item-value="id"
+                        v-model="editedItem.publisher"
+                        append-icon="mdi-bookshelf"
+                        label="Nome da editora"
+                      ></v-select>
                     </v-col>
                     <v-col cols="12" class="pb-0">
                       <v-menu
@@ -84,7 +85,7 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="editedItem.launchDate"
-                            label="Previsão de retorno"
+                            label="Data de lançamento"
                             append-icon="mdi-calendar"
                             readonly
                             v-bind="attrs"
@@ -128,15 +129,17 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-text-field
-            class="searchInput"
-            v-model="search"
-            label="Pesquisar"
-            color="c500"
-            clearable
-            outlined
-            dense
-          ></v-text-field>
+          <v-col class="d-flex pb-0" cols="12" md="5">
+            <v-text-field
+              class="searchInput"
+              v-model="search"
+              label="Pesquisar"
+              color="c500"
+              clearable
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
         </v-toolbar>
       </template>
 
@@ -200,7 +203,7 @@ export default {
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
       { text: 'Autor', value: 'author' },
-      { text: 'Editora', value: 'publisherName' },
+      { text: 'Editora', value: 'publisher' },
       {
         text: 'Lançamento',
         value: 'launchDate',
@@ -212,6 +215,7 @@ export default {
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
     books: [],
+    publishers: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
@@ -220,7 +224,7 @@ export default {
       rentedQuantity: 0,
       launchDate: '',
       author: '',
-      publisherName: '',
+      publisher: '',
     },
     defaultItem: {
       id: 0,
@@ -229,7 +233,7 @@ export default {
       rentedQuantity: 0,
       launchDate: '',
       author: '',
-      publisherName: '',
+      publisher: '',
     },
   }),
 
@@ -262,7 +266,7 @@ export default {
           rentedQuantity: 9,
           launchDate: '18/11/2020',
           author: 'Ingred Soares',
-          publisherName: 'Saraiva',
+          publisher: 'Saraiva',
         },
         {
           id: 2,
@@ -271,7 +275,7 @@ export default {
           rentedQuantity: 11,
           launchDate: '12/10/2019',
           author: 'Luiz Guilherme',
-          publisherName: 'Saraiva',
+          publisher: 'Saraiva',
         },
         {
           id: 3,
@@ -280,7 +284,7 @@ export default {
           rentedQuantity: 9,
           launchDate: '18/11/2020',
           author: 'Sem criatividade',
-          publisherName: 'Saraiva',
+          publisher: 'Saraiva',
         },
         {
           id: 4,
@@ -289,7 +293,7 @@ export default {
           rentedQuantity: 56,
           launchDate: '06/05/2021',
           author: 'Edsu',
-          publisherName: 'Saraiva',
+          publisher: 'Saraiva',
         },
         {
           id: 5,
@@ -298,7 +302,59 @@ export default {
           rentedQuantity: 24,
           launchDate: '18/11/2018',
           author: 'Pedro Edro',
-          publisherName: 'Saraiva',
+          publisher: 'Saraiva',
+        },
+      ];
+      this.publishers = [
+        {
+          id: 1,
+          name: 'Saraiva',
+          city: 'Fortaleza',
+        },
+        {
+          id: 2,
+          name: 'Ice cream sandwich',
+          city: 'Fortaleza',
+        },
+        {
+          id: 3,
+          name: 'Eclair',
+          city: 'Fortaleza',
+        },
+        {
+          id: 4,
+          name: 'Cupcake',
+          city: 'Fortaleza',
+        },
+        {
+          id: 5,
+          name: 'Gingerbread',
+          city: 'Fortaleza',
+        },
+        {
+          id: 6,
+          name: 'Jelly bean',
+          city: 'Fortaleza',
+        },
+        {
+          id: 7,
+          name: 'Lollipop',
+          city: 'Fortaleza',
+        },
+        {
+          id: 8,
+          name: 'Honeycomb',
+          city: 'Fortaleza',
+        },
+        {
+          id: 9,
+          name: 'Donut',
+          city: 'Fortaleza',
+        },
+        {
+          id: 10,
+          name: 'KitKat',
+          city: 'Fortaleza',
         },
       ];
     },

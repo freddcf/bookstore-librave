@@ -84,15 +84,17 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-text-field
-            class="searchInput"
-            v-model="search"
-            label="Pesquisar"
-            color="c500"
-            clearable
-            outlined
-            dense
-          ></v-text-field>
+          <v-col class="d-flex pb-0" cols="12" md="5">
+            <v-text-field
+              class="searchInput"
+              v-model="search"
+              label="Pesquisar"
+              color="c500"
+              clearable
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
         </v-toolbar>
       </template>
 
