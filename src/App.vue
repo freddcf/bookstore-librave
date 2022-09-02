@@ -1,27 +1,38 @@
 <template>
   <v-app>
-    <Navbar />
+    <Navbar v-if="verifyLogin"/>
 
-    <v-main class="c600">
+    <v-main class="c600" v-if="verifyLogin">
       <router-view />
     </v-main>
 
-    <Footer />
+    <Footer v-if="verifyLogin"/>
+
+    <LoginView v-else/>
   </v-app>
 </template>
 
 <script>
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
+import LoginView from './views/LoginView.vue';
 
 export default {
   name: 'App',
   components: {
     Navbar,
     Footer,
-  },
+    LoginView
+},
 
-  data: () => ({}),
+  data: () => ({
+    isLogged: false,
+  }),
+  computed: {
+    verifyLogin() {
+      return this.$route.name !== 'login' && this.$route.name !== 'register';
+    },
+  },
 };
 </script>
 

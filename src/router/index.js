@@ -1,45 +1,51 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import UserView from '../views/UserView.vue'
-import PublisherView from '../views/PublisherView.vue'
-import BookView from '../views/BookView.vue'
-import RentalView from '../views/RentalView.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import HomeView from '@/views/HomeView.vue';
+import UserView from '@/views/UserView.vue';
+import PublisherView from '@/views/PublisherView.vue';
+import BookView from '@/views/BookView.vue';
+import RentalView from '@/views/RentalView.vue';
+import LoginView from '@/views/LoginView.vue';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
   },
   {
     path: '/user',
     name: 'user',
-    component: UserView
+    component: UserView,
   },
   {
     path: '/publisher',
     name: 'publisher',
-    component: PublisherView
+    component: PublisherView,
   },
   {
     path: '/book',
     name: 'book',
-    component: BookView
+    component: BookView,
   },
   {
     path: '/rental',
     name: 'rental',
-    component: RentalView
-  }
-]
+    component: RentalView,
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+  },
+];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
