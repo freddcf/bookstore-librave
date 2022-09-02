@@ -36,19 +36,19 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.name"
-                        label="Publisher name"
-                        append-icon="mdi-book-open-page-variant-outline"
+                        label="Nome da editora"
+                        append-icon="mdi-bookshelf"
                         counter
                         maxlength="25"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.city"
-                        label="Publisher city"
+                        label="Cidade da editora"
                         append-icon="mdi-city-variant-outline"
                         counter
                         maxlength="20"

@@ -36,38 +36,38 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.name"
-                        label="Publisher name"
-                        append-icon="mdi-book-open-page-variant-outline"
+                        label="Nome do usuário"
+                        append-icon="mdi-account"
                         counter
                         maxlength="25"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.email"
-                        label="Publisher city"
-                        append-icon="mdi-city-variant-outline"
+                        label="Email do usuário"
+                        append-icon="mdi-email-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.city"
-                        label="Publisher city"
+                        label="Cidade do usuário"
                         append-icon="mdi-city-variant-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.address"
-                        label="Publisher city"
-                        append-icon="mdi-city-variant-outline"
+                        label="Endereço do usuário"
+                        append-icon="mdi-map-marker-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>

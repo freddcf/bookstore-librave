@@ -36,50 +36,67 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.name"
-                        label="Book name"
-                        append-icon="mdi-book-open-page-variant-outline"
+                        label="Nome do livro"
+                        append-icon="mdi-book-open-page-variant"
                         counter
                         maxlength="25"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.author"
-                        label="Book author"
-                        append-icon="mdi-city-variant-outline"
+                        label="Nome do autor"
+                        append-icon="mdi-account-box-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.publisherName"
-                        label="Publisher name"
-                        append-icon="mdi-city-variant-outline"
+                        label="Nome da editora"
+                        append-icon="mdi-bookshelf"
                         counter
                         maxlength="20"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="editedItem.launchDate"
-                        label="Launch date"
-                        append-icon="mdi-city-variant-outline"
-                        counter
-                        maxlength="20"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       <v-text-field
                         v-model="editedItem.quantity"
-                        label="Books quantity"
-                        append-icon="mdi-city-variant-outline"
+                        label="Quantidade de livros"
+                        append-icon="mdi-book-plus-multiple-outline"
                         counter
                         maxlength="20"
                       ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" class="pb-0">
+                      <v-menu
+                        v-model="modal"
+                        :close-on-content-click="false"
+                        :nudge-right="0"
+                        transition="slide-y-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="editedItem.launchDate"
+                            label="Previsão de retorno"
+                            append-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="editedItem.launchDate"
+                          @input="modal = false"
+                          color="c500"
+                        ></v-date-picker>
+                      </v-menu>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -178,12 +195,18 @@ export default {
     search: '',
     dialog: false,
     dialogDelete: false,
+    modal: false,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
       { text: 'Autor', value: 'author' },
       { text: 'Editora', value: 'publisherName' },
-      { text: 'Lançamento', value: 'launchDate', sortable: false, align: 'center' },
+      {
+        text: 'Lançamento',
+        value: 'launchDate',
+        sortable: false,
+        align: 'center',
+      },
       { text: 'Quantidade', value: 'quantity', align: 'center' },
       { text: 'Alugados', value: 'rentedQuantity', align: 'center' },
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
@@ -193,7 +216,7 @@ export default {
     editedItem: {
       id: 0,
       name: '',
-      quantity: 0,
+      quantity: '',
       rentedQuantity: 0,
       launchDate: '',
       author: '',
@@ -202,7 +225,7 @@ export default {
     defaultItem: {
       id: 0,
       name: '',
-      quantity: 0,
+      quantity: '',
       rentedQuantity: 0,
       launchDate: '',
       author: '',

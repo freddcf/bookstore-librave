@@ -31,13 +31,11 @@ export default {
 }
 
 .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  font-size: 16px;
+  font-size: 15px !important;
 }
-.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-  font-size: 15px;
-}
+
 .v-data-footer {
-  font-size: 15px;
+  font-size: 14px !important;
 }
 
 .theme--light.v-divider {

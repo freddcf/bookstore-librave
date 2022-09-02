@@ -35,15 +35,86 @@
 
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="editedItem.returnDate"
-                        label="Data de retorno"
-                        append-icon="mdi-city-variant-outline"
-                        counter
-                        maxlength="20"
-                      ></v-text-field>
+                  <v-row v-if="editedIndex === -1">
+                    <v-col cols="12" class="pb-0">
+                      <v-menu
+                        v-model="modal"
+                        :close-on-content-click="false"
+                        :nudge-right="0"
+                        transition="slide-y-transitionn"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="editedItem.rentalDate"
+                            label="Data de aluguel"
+                            append-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="editedItem.rentalDate"
+                          @input="modal = false"
+                          color="c500"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="12" class="pb-0">
+                      <v-menu
+                        v-model="modal2"
+                        :close-on-content-click="false"
+                        :nudge-right="0"
+                        transition="slide-y-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="editedItem.returnForecast"
+                            label="Previsão de retorno"
+                            append-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="editedItem.returnForecast"
+                          @input="modal2 = false"
+                          color="c500"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                  </v-row>
+                  <v-row v-else>
+                    <v-col cols="12" class="pb-0">
+                      <v-menu
+                        v-model="modal3"
+                        :close-on-content-click="false"
+                        :nudge-right="0"
+                        transition="slide-y-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="editedItem.returnDate"
+                            label="Data de retorno"
+                            append-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="editedItem.returnDate"
+                          @input="modal3 = false"
+                          color="c500"
+                        ></v-date-picker>
+                      </v-menu>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -138,6 +209,9 @@ export default {
     search: '',
     dialog: false,
     dialogDelete: false,
+    modal: false,
+    modal2: false,
+    modal3: false,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Livro', value: 'bookName' },
