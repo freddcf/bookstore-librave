@@ -6,6 +6,7 @@ import PublisherView from '@/views/PublisherView.vue';
 import BookView from '@/views/BookView.vue';
 import RentalView from '@/views/RentalView.vue';
 import LoginView from '@/views/LoginView.vue';
+import LoginRecoverView from '@/views/LoginRecoverView.vue';
 
 Vue.use(VueRouter);
 
@@ -39,6 +40,16 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginView,
+  },
+  {
+    path: '/recover',
+    name: 'recover',
+    component: LoginRecoverView,
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: HomeView,
   },
 ];
 

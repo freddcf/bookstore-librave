@@ -1,15 +1,17 @@
 <template>
-  <div class="c400 login-screen d-flex justify-center align-center">
+  <div class="c400 login-recover d-flex justify-center align-center">
+    <v-btn
+      color="c400 c000--text"
+      class="return-btn py-8"
+      elevation="0"
+      @click="$router.push('login')"
+    >
+      <PhArrowUUpLeft size="40" weight="bold" />
+    </v-btn>
     <div class="login d-flex flex-column justify-center align-center">
-      <v-btn
-        color="c400 c000--text"
-        class="return-btn py-8"
-        elevation="0"
-        @click="$router.push('/')"
-      >
-        <PhArrowUUpLeft size="40" weight="bold" />
-      </v-btn>
-      <h1 class="c000--text display-3 font-weight-bold mb-5">LOGIN</h1>
+      <h1 class="c000--text display-2 font-weight-bold mb-5">
+        Recover Password
+      </h1>
       <form class="form-inputs">
         <v-col cols="12" class="form-inputs-wrapper">
           <v-text-field
@@ -29,35 +31,27 @@
             </template>
           </v-text-field>
           <v-text-field
-            class="form-input rounded-lg"
-            v-model.trim="password"
-            :error-messages="passwordErrors"
-            @input="v$.password.$touch()"
-            @blur="v$.password.$touch()"
-            :append-icon="showInputPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="showInputPassword ? 'text' : 'password'"
+            class="form-input rounded-lg mb-3"
+            v-model.trim="email"
+            :error-messages="emailErrors"
+            @input="v$.email.$touch()"
+            @blur="v$.email.$touch()"
             solo
-            label="Password"
+            label="Email"
             color="c500"
-            @click:append="showInputPassword = !showInputPassword"
           >
             <template v-slot:prepend-inner>
-              <v-icon color="c400" class="mr-1">
-                mdi-lock-alert-outline
-              </v-icon>
+              <v-icon color="c400" class="mr-1"> mdi-email-outline </v-icon>
             </template>
           </v-text-field>
-          <router-link class="forgot-password" to="/recover">
-            Esqueceu a senha?
-          </router-link>
           <v-btn
             block
             height="60px"
-            color="c600 c000--text rounded-lg mt-3"
+            color="c600 c000--text rounded-lg"
             class="title"
             @click="submit"
           >
-            Sign in
+            Restore
           </v-btn>
         </v-col>
       </form>
@@ -66,33 +60,33 @@
 </template>
 
 <script>
-import { required } from '@vuelidate/validators';
+import { required, email } from '@vuelidate/validators';
 import useValidate from '@vuelidate/core';
 import { PhArrowUUpLeft } from 'phosphor-vue';
 
 export default {
-  name: 'LoginView',
+  name: 'LoginRecoverView',
   components: {
     PhArrowUUpLeft,
   },
   data: () => ({
     username: '',
-    password: '',
-    showInputPassword: '',
+    email: '',
   }),
   setup: () => ({ v$: useValidate() }),
   validations() {
     return {
       username: { required },
-      password: { required },
+      email: { required, email },
     };
   },
   methods: {
     submit() {
+      console.log(this.v$.email);
       this.v$.$touch();
       if (!this.v$.$error) {
         console.log('Perfect');
-        console.log(this.username + ' - ' + this.password);
+        console.log(this.username + ' - ' + this.email);
         // Do action
       }
     },
@@ -102,14 +96,15 @@ export default {
       const errors = [];
       if (!this.v$.username.$dirty) return errors;
       if (this.v$.username.required.$invalid)
-        errors.push('Username is required.');
+        errors.push('Este campo é obrigatório');
       return errors;
     },
-    passwordErrors() {
+    emailErrors() {
       const errors = [];
-      if (!this.v$.password.$dirty) return errors;
-      if (this.v$.password.required.$invalid)
-        errors.push('Password is required.');
+      if (!this.v$.email.$dirty) return errors;
+      if (this.v$.email.required.$invalid)
+        errors.push('Este campo é obrigatório');
+      if (this.v$.email.email.$invalid) errors.push('Email inválido');
       return errors;
     },
   },
@@ -117,7 +112,7 @@ export default {
 </script>
 
 <style scoped>
-.login-screen {
+.login-recover {
   height: 100vh;
 }
 .form-inputs {
@@ -128,13 +123,6 @@ export default {
 }
 .v-input__prepend-inner .v-icon {
   font-size: 35px;
-}
-
-.forgot-password {
-  display: block;
-  text-decoration: none;
-  color: #fff;
-  text-align: right;
 }
 
 .return-btn {

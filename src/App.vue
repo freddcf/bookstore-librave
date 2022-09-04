@@ -1,44 +1,43 @@
 <template>
   <v-app>
-    <Navbar v-if="verifyLogin" />
+    <Navbar
+      v-if="
+        this.$router.currentRoute.path !== '/login' &&
+        this.$router.currentRoute.path !== '/recover'
+      "
+    />
 
-    <v-main class="c600" v-if="verifyLogin">
+    <v-main class="c600">
       <router-view />
     </v-main>
 
-    <Footer v-if="verifyLogin" />
-
-    <LoginView v-else />
+    <Footer
+      v-if="
+        this.$router.currentRoute.path !== '/login' &&
+        this.$router.currentRoute.path !== '/recover'
+      "
+    />
   </v-app>
 </template>
 
 <script>
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
-import LoginView from './views/LoginView.vue';
 
 export default {
   name: 'App',
   components: {
     Navbar,
     Footer,
-    LoginView,
   },
 
-  data: () => ({
-    isLogged: false,
-  }),
-  computed: {
-    verifyLogin() {
-      return this.$route.name !== 'login' && this.$route.name !== 'register';
-    },
-  },
+  data: () => ({}),
 };
 </script>
 
 <style>
 .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  font-size: 15px !important;
+  font-size: 16px !important;
 }
 
 .v-data-footer {
