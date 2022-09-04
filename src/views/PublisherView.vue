@@ -14,7 +14,7 @@
           >
           <v-divider class="mx-6" light vertical></v-divider>
 
-          <v-dialog v-model="dialog" max-width="500px">
+          <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 dark
@@ -24,6 +24,7 @@
                 height="40"
                 v-bind="attrs"
                 v-on="on"
+                @click="this.$refs.form.resetValidation()"
               >
                 <PhPlus size="30" weight="bold" />
               </v-btn>
@@ -35,26 +36,38 @@
 
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12" class="pb-0">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Nome da editora"
-                        append-icon="mdi-bookshelf"
-                        counter
-                        maxlength="25"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" class="pb-0">
-                      <v-text-field
-                        v-model="editedItem.city"
-                        label="Cidade da editora"
-                        append-icon="mdi-city-variant-outline"
-                        counter
-                        maxlength="20"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <v-form class="px-1" ref="form">
+                    <v-row>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-model="editedItem.name"
+                          label="Nome da editora"
+                          append-icon="mdi-bookshelf"
+                          required
+                          counter="25"
+                          :rules="[
+                            rules.required,
+                            rules.maxLength,
+                            rules.minLength,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-model="editedItem.city"
+                          label="Cidade da editora"
+                          append-icon="mdi-city-variant-outline"
+                          required
+                          counter="20"
+                          :rules="[
+                            rules.required,
+                            rules.maxCityLength,
+                            rules.minLength,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
 
@@ -65,7 +78,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" persistent max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
                 >Are you sure you want to delete this item?</v-card-title
@@ -84,12 +97,14 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-col class="d-flex pb-0" cols="12" md="5">
+          <v-col class="d-flex" cols="12" md="5">
             <v-text-field
               class="searchInput"
+              hide-details
               v-model="search"
               label="Pesquisar"
               color="c500"
+              append-icon="mdi-magnify"
               clearable
               outlined
               dense
@@ -97,28 +112,58 @@
           </v-col>
         </v-toolbar>
       </template>
+      <v-tooltip top color="#0061A3">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            color="primary"
+            v-bind="attrs"
+            v-on="on"
+            text
+            small
+            rounded
+            @click="showEdit(item)"
+          >
+            <v-icon dark> mdi-pencil </v-icon>
+          </v-btn>
+        </template>
+        <span>Editar</span>
+      </v-tooltip>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn
-          outlined
-          color="c800"
-          class="tableBtn blueBtn rounded-md px-0 mr-2"
-          min-width="30"
-          height="30"
-          @click="editItem(item)"
-        >
-          <PhNotePencil size="25" weight="bold" />
-        </v-btn>
-        <v-btn
-          outlined
-          color="c900"
-          class="tableBtn redBtn rounded-md px-0"
-          min-width="30"
-          height="30"
-          @click="deleteItem(item)"
-        >
-          <PhTrash size="25" weight="bold" />
-        </v-btn>
+        <v-tooltip top color="c800">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              outlined
+              color="c800"
+              class="tableBtn blueBtn rounded-md px-0 mr-2"
+              min-width="30"
+              height="30"
+              v-bind="attrs"
+              v-on="on"
+              @click="editItem(item)"
+            >
+              <PhNotePencil size="25" weight="bold" />
+            </v-btn>
+          </template>
+          <span>Editar</span>
+        </v-tooltip>
+        <v-tooltip top color="c900">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              outlined
+              color="c900"
+              class="tableBtn redBtn rounded-md px-0"
+              min-width="30"
+              height="30"
+              v-bind="attrs"
+              v-on="on"
+              @click="deleteItem(item)"
+            >
+              <PhTrash size="25" weight="bold" />
+            </v-btn>
+          </template>
+          <span>Deletar</span>
+        </v-tooltip>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -159,6 +204,13 @@ export default {
       name: '',
       city: '',
     },
+    rules: {
+      required: (value) => !!value || 'Este campo é obrigatório.',
+      maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
+      maxCityLength: (value) =>
+        value.length <= 30 || 'Máximo de 30 caracteres.',
+      minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
+    },
   }),
 
   computed: {
@@ -170,6 +222,7 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+      this.$refs.form.resetValidation();
     },
     dialogDelete(val) {
       val || this.closeDelete();

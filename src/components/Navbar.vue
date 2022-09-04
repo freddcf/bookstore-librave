@@ -51,7 +51,7 @@
         tile
         class="transparent c000--text"
         active-class="activated-btn"
-        to="/rental"
+        to="/login"
       >
         <PhNotepad size="22" />
         Aluguel
@@ -88,11 +88,14 @@ export default {
 .v-app-bar {
   padding: 0 100px;
 }
-.v-btn {
-  border-bottom: 3px solid transparent !important;
-  transition: all 0.3s;
-}
 .v-btn.activated-btn {
+  position: relative;
+}
+.v-btn.activated-btn::after {
+  position: absolute;
+  content: '';
+  height: 100%;
+  width: 100%;
   border-bottom: 3px solid #02af8e !important;
   transition: all 0.3s;
 }

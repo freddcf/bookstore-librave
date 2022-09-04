@@ -14,7 +14,7 @@
           >
           <v-divider class="mx-6" light vertical></v-divider>
 
-          <v-dialog v-model="dialog" max-width="500px">
+          <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 dark
@@ -24,6 +24,7 @@
                 height="40"
                 v-bind="attrs"
                 v-on="on"
+                @click="this.$refs.form.resetValidation()"
               >
                 <PhPlus size="30" weight="bold" />
               </v-btn>
@@ -35,108 +36,130 @@
 
               <v-card-text>
                 <v-container>
-                  <v-row v-if="editedIndex === -1">
-                    <v-col class="d-flex pb-0" cols="12">
-                      <v-select
-                        :items="books"
-                        item-text="name"
-                        item-value="id"
-                        v-model="editedItem.book"
-                        append-icon="mdi-book-open-page-variant"
-                        label="Nome do livro"
-                      ></v-select>
-                    </v-col>
-                    <v-col class="d-flex pb-0" cols="12">
-                      <v-select
-                        :items="users"
-                        item-text="name"
-                        item-value="id"
-                        v-model="editedItem.user"
-                        append-icon="mdi-account"
-                        label="Nome do usuário"
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="12" class="pb-0">
-                      <v-menu
-                        v-model="modal"
-                        :close-on-content-click="false"
-                        :nudge-right="0"
-                        transition="slide-y-transitionn"
-                        offset-y
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="editedItem.rentalDate"
-                            label="Data de aluguel"
-                            append-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="editedItem.rentalDate"
-                          @input="modal = false"
-                          color="c500"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                    <v-col cols="12" class="pb-0">
-                      <v-menu
-                        v-model="modal2"
-                        :close-on-content-click="false"
-                        :nudge-right="0"
-                        transition="slide-y-transition"
-                        offset-y
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="editedItem.returnForecast"
-                            label="Previsão de retorno"
-                            append-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="editedItem.returnForecast"
-                          @input="modal2 = false"
-                          color="c500"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>
-                  <v-row v-else>
-                    <v-col cols="12" class="pb-0">
-                      <v-menu
-                        v-model="modal3"
-                        :close-on-content-click="false"
-                        :nudge-right="0"
-                        transition="slide-y-transition"
-                        offset-y
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="editedItem.returnDate"
-                            label="Data de retorno"
-                            append-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="editedItem.returnDate"
-                          @input="modal3 = false"
-                          color="c500"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>
+                  <v-form v-if="editedIndex === -1" class="px-1" ref="form">
+                    <v-row>
+                      <v-col class="d-flex pb-0" cols="12">
+                        <v-select
+                          :items="books"
+                          item-text="name"
+                          item-value="id"
+                          v-model="editedItem.book"
+                          append-icon="mdi-book-open-page-variant"
+                          label="Nome do livro"
+                          :rules="[rules.required]"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <v-col class="d-flex pb-0" cols="12">
+                        <v-select
+                          :items="users"
+                          item-text="name"
+                          item-value="id"
+                          v-model="editedItem.user"
+                          append-icon="mdi-account"
+                          label="Nome do usuário"
+                          :rules="[rules.required]"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-menu
+                          v-model="modal"
+                          :nudge-right="0"
+                          transition="slide-y-transitionn"
+                          offset-y
+                          min-width="auto"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                              v-model="editedItem.rentalDate"
+                              label="Data de aluguel"
+                              append-icon="mdi-calendar"
+                              readonly
+                              v-bind="attrs"
+                              v-on="on"
+                              required
+                              :rules="[rules.required]"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            v-model="date"
+                            @input="
+                              modal = false;
+                              editedItem.rentalDate = formatDate;
+                            "
+                            color="c500"
+                            :min="todayDate"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-menu
+                          v-model="modal2"
+                          :nudge-right="0"
+                          transition="slide-y-transition"
+                          offset-y
+                          min-width="auto"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                              v-model="editedItem.returnForecast"
+                              label="Previsão de retorno"
+                              append-icon="mdi-calendar"
+                              readonly
+                              v-bind="attrs"
+                              v-on="on"
+                              required
+                              :rules="[rules.required]"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            v-model="date"
+                            @input="
+                              modal2 = false;
+                              editedItem.returnForecast = formatDate;
+                            "
+                            color="c500"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                    </v-row>
+                  </v-form>
+                  <v-form v-else class="px-3" ref="form">
+                    <v-row>
+                      <v-col cols="12" class="pb-0">
+                        <v-menu
+                          v-model="modal3"
+                          :nudge-right="0"
+                          transition="slide-y-transition"
+                          offset-y
+                          min-width="auto"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                              v-model="editedItem.returnDate"
+                              label="Data de retorno"
+                              append-icon="mdi-calendar"
+                              readonly
+                              v-bind="attrs"
+                              v-on="on"
+                              required
+                              :rules="[rules.required]"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            v-model="date"
+                            @input="
+                              modal3 = false;
+                              editedItem.returnDate = formatDate;
+                            "
+                            color="c500"
+                            :min="originalFormatDate"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
 
@@ -147,7 +170,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" persistent max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
                 >Are you sure you want to delete this item?</v-card-title
@@ -166,12 +189,14 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-col class="d-flex pb-0" cols="12" md="5">
+          <v-col class="d-flex" cols="12" md="5">
             <v-text-field
               class="searchInput"
+              hide-details
               v-model="search"
               label="Pesquisar"
               color="c500"
+              append-icon="mdi-magnify"
               clearable
               outlined
               dense
@@ -187,28 +212,40 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn
-          v-if="item.returnDate === 'Não devolvido'"
-          outlined
-          color="c700"
-          class="tableBtn orangeBtn rounded-md px-0"
-          min-width="30"
-          height="30"
-          @click="editItem(item)"
-        >
-          <PhBookmarksSimple size="25" weight="bold" />
-        </v-btn>
-        <v-btn
-          v-else
-          outlined
-          color="c900"
-          class="tableBtn redBtn rounded-md px-0"
-          min-width="30"
-          height="30"
-          @click="deleteItem(item)"
-        >
-          <PhTrash size="25" weight="bold" />
-        </v-btn>
+        <v-tooltip v-if="item.returnDate === 'Não devolvido'" top color="c700">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              outlined
+              color="c700"
+              class="tableBtn orangeBtn rounded-md px-0"
+              min-width="30"
+              height="30"
+              v-bind="attrs"
+              v-on="on"
+              @click="editItem(item)"
+            >
+              <PhBookmarksSimple size="25" weight="bold" />
+            </v-btn>
+          </template>
+          <span>Devolver</span>
+        </v-tooltip>
+        <v-tooltip v-else top color="c900">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              outlined
+              color="c900"
+              class="tableBtn redBtn rounded-md px-0"
+              min-width="30"
+              height="30"
+              v-bind="attrs"
+              v-on="on"
+              @click="deleteItem(item)"
+            >
+              <PhTrash size="25" weight="bold" />
+            </v-btn>
+          </template>
+          <span>Deletar</span>
+        </v-tooltip>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -234,10 +271,12 @@ export default {
     modal: false,
     modal2: false,
     modal3: false,
+    todayDate: new Date().toISOString().slice(0, 10),
+    date: '',
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
-      { text: 'Livro', value: 'book' },
-      { text: 'Usuário', value: 'user' },
+      { text: 'Livro', value: 'book.name' },
+      { text: 'Usuário', value: 'user.name' },
       {
         text: 'Aluguel',
         value: 'rentalDate',
@@ -268,7 +307,7 @@ export default {
       book: '',
       rentalDate: '',
       returnForecast: '',
-      returnDate: '',
+      returnDate: 'Não devolvido',
     },
     defaultItem: {
       id: 0,
@@ -278,17 +317,27 @@ export default {
       returnForecast: '',
       returnDate: '',
     },
+    rules: {
+      required: (value) => !!value || 'Este campo é obrigatório.',
+    },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Nova aluguel' : 'Editar aluguel';
+      return this.editedIndex === -1 ? 'Novo aluguel' : 'Editar aluguel';
+    },
+    formatDate() {
+      return this.date.replaceAll('-', '/');
+    },
+    originalFormatDate() {
+      return this.editedItem.rentalDate.replaceAll('/', '-');
     },
   },
 
   watch: {
     dialog(val) {
       val || this.close();
+      this.$refs.form.resetValidation();
     },
     dialogDelete(val) {
       val || this.closeDelete();
@@ -304,40 +353,110 @@ export default {
       this.rentals = [
         {
           id: 1,
-          user: 'Fred Fonseca',
-          book: 'Como ficar rico',
+          user: {
+            id: 3,
+            name: 'Eclair',
+            city: 'Fortaleza',
+            email: 'ecate@gmail.com',
+            address: 'Rua Savio Freitas, 435',
+          },
+          book: {
+            id: 1,
+            name: 'Spring Security',
+            quantity: 20,
+            rentedQuantity: 9,
+            launchDate: '18/11/2020',
+            author: 'Ingred Soares',
+            publisher: 'Saraiva',
+          },
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: 'Não devolvido',
         },
         {
           id: 2,
-          user: 'Caio',
-          book: 'Teste01',
-          rentalDate: '12/05/2021',
-          returnForecast: '05/06/2021',
+          user: {
+            id: 3,
+            name: 'Eclair',
+            city: 'Fortaleza',
+            email: 'ecate@gmail.com',
+            address: 'Rua Savio Freitas, 435',
+          },
+          book: {
+            id: 1,
+            name: 'Spring Security',
+            quantity: 20,
+            rentedQuantity: 9,
+            launchDate: '18/11/2020',
+            author: 'Ingred Soares',
+            publisher: 'Saraiva',
+          },
+          rentalDate: '2022/09/03',
+          returnForecast: '2022/10/09',
           returnDate: 'Não devolvido',
         },
         {
           id: 3,
-          user: 'Luc',
-          book: 'Teste 02',
+          user: {
+            id: 3,
+            name: 'Eclair',
+            city: 'Fortaleza',
+            email: 'ecate@gmail.com',
+            address: 'Rua Savio Freitas, 435',
+          },
+          book: {
+            id: 1,
+            name: 'Spring Security',
+            quantity: 20,
+            rentedQuantity: 9,
+            launchDate: '18/11/2020',
+            author: 'Ingred Soares',
+            publisher: 'Saraiva',
+          },
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: '28/05/2021 (Com atraso)',
         },
         {
           id: 4,
-          user: 'Tiago',
-          book: 'Java e talz',
+          user: {
+            id: 3,
+            name: 'Eclair',
+            city: 'Fortaleza',
+            email: 'ecate@gmail.com',
+            address: 'Rua Savio Freitas, 435',
+          },
+          book: {
+            id: 1,
+            name: 'Spring Security',
+            quantity: 20,
+            rentedQuantity: 9,
+            launchDate: '18/11/2020',
+            author: 'Ingred Soares',
+            publisher: 'Saraiva',
+          },
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: '28/05/2021 (No prazo)',
         },
         {
           id: 5,
-          user: 'Jonas',
-          book: 'Vue Js',
+          user: {
+            id: 3,
+            name: 'Eclair',
+            city: 'Fortaleza',
+            email: 'ecate@gmail.com',
+            address: 'Rua Savio Freitas, 435',
+          },
+          book: {
+            id: 1,
+            name: 'Spring Security',
+            quantity: 20,
+            rentedQuantity: 9,
+            launchDate: '18/11/2020',
+            author: 'Ingred Soares',
+            publisher: 'Saraiva',
+          },
           rentalDate: '12/05/2021',
           returnForecast: '05/06/2021',
           returnDate: 'Não devolvido',
