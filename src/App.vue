@@ -1,14 +1,14 @@
 <template>
   <v-app>
-    <Navbar v-if="verifyLogin"/>
+    <Navbar v-if="verifyLogin" />
 
     <v-main class="c600" v-if="verifyLogin">
       <router-view />
     </v-main>
 
-    <Footer v-if="verifyLogin"/>
+    <Footer v-if="verifyLogin" />
 
-    <LoginView v-else/>
+    <LoginView v-else />
   </v-app>
 </template>
 
@@ -22,8 +22,8 @@ export default {
   components: {
     Navbar,
     Footer,
-    LoginView
-},
+    LoginView,
+  },
 
   data: () => ({
     isLogged: false,
@@ -37,10 +37,6 @@ export default {
 </script>
 
 <style>
-.searchInput div.v-input__control div.v-text-field__details {
-  display: none;
-}
-
 .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   font-size: 15px !important;
 }
@@ -73,5 +69,16 @@ export default {
 }
 .tableBtn.orangeBtn {
   background: rgba(255, 126, 85, 0.2) !important;
+}
+
+.form-input.v-text-field .v-label {
+  font-size: 20px;
+}
+
+.form-input.v-text-field .v-input__control .v-input__slot {
+  min-height: 60px;
+}
+.form-input .v-input__control .v-text-field__details .v-messages {
+  font-size: 14px;
 }
 </style>
