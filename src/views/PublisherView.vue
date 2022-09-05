@@ -283,10 +283,14 @@ export default {
       });
     },
 
-    save() {
+    async save() {
       if (!this.$refs.form.validate()) return;
       if (this.editedIndex > -1) {
-        publisherAccess.put(this.editedIndex, this.editedItem).then(() => this.fetchApi());
+        try {
+          await publisherAccess.put(this.editedIndex, this.editedItem).then(() => this.fetchApi());
+        } catch(e) {
+          console.log(e.response.data.message)
+        }
       } else {
         publisherAccess.post(this.editedItem).then(() => this.fetchApi());
       }
