@@ -2,6 +2,8 @@
   <div class="py-6 table d-flex justify-center">
     <v-data-table
       class="px-8 py-8 dataTable"
+      :loading="isLoading"
+      loading-text="Carregando dados... Por favor espere!"
       :headers="headers"
       :items="publishers"
       :search="search"
@@ -24,7 +26,6 @@
                 height="40"
                 v-bind="attrs"
                 v-on="on"
-                @click="this.$refs.form.resetValidation()"
               >
                 <PhPlus size="30" weight="bold" />
               </v-btn>
@@ -36,7 +37,12 @@
 
               <v-card-text>
                 <v-container>
-                  <v-form class="px-1" ref="form">
+                  <v-form
+                    class="px-1"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
@@ -74,7 +80,9 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="error" text @click="close"> Cancelar </v-btn>
-                <v-btn color="primary" text @click="save"> Salvar </v-btn>
+                <v-btn color="primary" text @click="save" :disabled="!valid">
+                  Salvar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -166,7 +174,7 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
+        <h3>[Tabela vazia...]</h3>
       </template>
     </v-data-table>
   </div>
@@ -174,6 +182,7 @@
 
 <script>
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
+import publisherAccess from '@/services/publisherAccess'
 
 export default {
   name: 'PublisherView',
@@ -184,8 +193,10 @@ export default {
   },
   data: () => ({
     search: '',
+    isLoading: true,
     dialog: false,
     dialogDelete: false,
+    valid: true,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
@@ -222,7 +233,7 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
-      this.$refs.form.resetValidation();
+      val || this.$refs.form.resetValidation();
     },
     dialogDelete(val) {
       val || this.closeDelete();
@@ -230,79 +241,29 @@ export default {
   },
 
   created() {
-    this.initialize();
+    this.fetchApi();
   },
 
   methods: {
-    initialize() {
-      this.publishers = [
-        {
-          id: 1,
-          name: 'Saraiva',
-          city: 'Fortaleza',
-        },
-        {
-          id: 2,
-          name: 'Ice cream sandwich',
-          city: 'Fortaleza',
-        },
-        {
-          id: 3,
-          name: 'Eclair',
-          city: 'Fortaleza',
-        },
-        {
-          id: 4,
-          name: 'Cupcake',
-          city: 'Fortaleza',
-        },
-        {
-          id: 5,
-          name: 'Gingerbread',
-          city: 'Fortaleza',
-        },
-        {
-          id: 6,
-          name: 'Jelly bean',
-          city: 'Fortaleza',
-        },
-        {
-          id: 7,
-          name: 'Lollipop',
-          city: 'Fortaleza',
-        },
-        {
-          id: 8,
-          name: 'Honeycomb',
-          city: 'Fortaleza',
-        },
-        {
-          id: 9,
-          name: 'Donut',
-          city: 'Fortaleza',
-        },
-        {
-          id: 10,
-          name: 'KitKat',
-          city: 'Fortaleza',
-        },
-      ];
+    fetchApi() {
+      this.isLoading = false;
+      publisherAccess.getAll().then((res) => { this.publishers = res.data.content });
     },
 
     editItem(item) {
-      this.editedIndex = this.publishers.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.publishers.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.publishers.splice(this.editedIndex, 1);
+      publisherAccess.delete(this.editedIndex).then(() => this.fetchApi())
       this.closeDelete();
     },
 
@@ -323,11 +284,13 @@ export default {
     },
 
     save() {
+      if (!this.$refs.form.validate()) return;
       if (this.editedIndex > -1) {
-        Object.assign(this.publishers[this.editedIndex], this.editedItem);
+        publisherAccess.put(this.editedIndex, this.editedItem).then(() => this.fetchApi());
       } else {
-        this.publishers.push(this.editedItem);
+        publisherAccess.post(this.editedItem).then(() => this.fetchApi());
       }
+      
       this.close();
     },
   },
