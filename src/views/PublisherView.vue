@@ -109,22 +109,6 @@
           </v-col>
         </v-toolbar>
       </template>
-      <v-tooltip top color="#0061A3">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="primary"
-            v-bind="attrs"
-            v-on="on"
-            text
-            small
-            rounded
-            @click="showEdit(item)"
-          >
-            <v-icon dark> mdi-pencil </v-icon>
-          </v-btn>
-        </template>
-        <span>Editar</span>
-      </v-tooltip>
 
       <template v-slot:[`item.actions`]="{ item }">
         <v-tooltip top color="c800">
@@ -268,9 +252,9 @@ export default {
           });
         }
         this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        });
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
       });
     },
 
@@ -301,7 +285,7 @@ export default {
           icon: 'success',
           allowOutsideClick: false,
         }).then(() => {
-          window.Toast.fire('Editora cadastrada', '', 'info');
+          window.Toast.fire('Editora cadastrada', '', 'success');
         });
       } catch (e) {
         this.$swal({
@@ -326,7 +310,7 @@ export default {
           icon: 'success',
           allowOutsideClick: false,
         }).then(() => {
-          window.Toast.fire('Editora alterada', '', 'info');
+          window.Toast.fire('Editora alterada', '', 'success');
         });
       } catch (e) {
         this.$swal({
