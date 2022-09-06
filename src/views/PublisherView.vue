@@ -8,6 +8,12 @@
       :items="publishers"
       :search="search"
       :items-per-page="5"
+      :sort-by="['id']"
+      :footer-props="{
+        itemsPerPageOptions: [5, 10, 25, 50],
+      }"
+      update:sort-by
+      multi-sort
     >
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
@@ -83,23 +89,6 @@
                 <v-btn color="primary" text @click="save" :disabled="!valid">
                   Salvar
                 </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" persistent max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancelar</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -182,7 +171,7 @@
 
 <script>
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
-import publisherAccess from '@/services/publisherAccess'
+import publisherAccess from '@/services/publisherAccess';
 
 export default {
   name: 'PublisherView',
@@ -195,7 +184,6 @@ export default {
     search: '',
     isLoading: true,
     dialog: false,
-    dialogDelete: false,
     valid: true,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
@@ -235,9 +223,6 @@ export default {
       val || this.close();
       val || this.$refs.form.resetValidation();
     },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
   },
 
   created() {
@@ -246,8 +231,10 @@ export default {
 
   methods: {
     fetchApi() {
-      this.isLoading = false;
-      publisherAccess.getAll().then((res) => { this.publishers = res.data.content });
+      publisherAccess.getAll().then((res) => {
+        this.publishers = res.data.content;
+        this.isLoading = false;
+      });
     },
 
     editItem(item) {
@@ -259,12 +246,32 @@ export default {
     deleteItem(item) {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
+      this.deleteItemConfirm();
     },
 
     deleteItemConfirm() {
-      publisherAccess.delete(this.editedIndex).then(() => this.fetchApi())
-      this.closeDelete();
+      this.$swal({
+        title: 'Você deseja deletar esse registro?',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Deletar',
+        denyButtonText: 'Cancelar',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.delete();
+        } else if (result.isDenied) {
+          this.$swal({
+            title: 'Deleção interrompida!',
+            icon: 'info',
+            allowOutsideClick: false,
+          });
+        }
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        });
+      });
     },
 
     close() {
@@ -275,27 +282,87 @@ export default {
       });
     },
 
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     async save() {
       if (!this.$refs.form.validate()) return;
       if (this.editedIndex > -1) {
-        try {
-          await publisherAccess.put(this.editedIndex, this.editedItem).then(() => this.fetchApi());
-        } catch(e) {
-          console.log(e.response.data.message)
-        }
+        this.update();
       } else {
-        publisherAccess.post(this.editedItem).then(() => this.fetchApi());
+        this.insert();
       }
-      
       this.close();
+    },
+
+    async insert() {
+      try {
+        await publisherAccess.post(this.editedItem).then(() => this.fetchApi());
+        this.$swal({
+          title: 'Sucesso',
+          text: 'Editora cadastrada!',
+          icon: 'success',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Editora cadastrada', '', 'info');
+        });
+      } catch (e) {
+        this.$swal({
+          title: 'Opss...',
+          text: e.response.data.message,
+          icon: 'info',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Erro ao cadastrar editora', '', 'error');
+        });
+      }
+    },
+
+    async update() {
+      try {
+        await publisherAccess
+          .put(this.editedIndex, this.editedItem)
+          .then(() => this.fetchApi());
+        this.$swal({
+          title: 'Sucesso',
+          text: 'Editora alterada!',
+          icon: 'success',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Editora alterada', '', 'info');
+        });
+      } catch (e) {
+        this.$swal({
+          title: 'Opss...',
+          text: e.response.data.message,
+          icon: 'info',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Erro ao editar editora', '', 'error');
+        });
+      }
+    },
+
+    async delete() {
+      try {
+        await publisherAccess
+          .delete(this.editedIndex)
+          .then(() => this.fetchApi());
+        this.$swal({
+          title: 'Sucesso',
+          text: 'Editora deletada!',
+          icon: 'success',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Editora deletada', '', 'info');
+        });
+      } catch (e) {
+        this.$swal({
+          title: 'Opss...',
+          text: e.response.data.message,
+          icon: 'info',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.Toast.fire('Erro ao deletar editora', '', 'error');
+        });
+      }
     },
   },
 };

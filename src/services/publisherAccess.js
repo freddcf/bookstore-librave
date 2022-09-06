@@ -5,7 +5,7 @@ export default {
     return http.get('/publishers');
   },
   getById: (id) => {
-    return http.get(`/publishers/${id}`)
+    return http.get(`/publishers/${id}`);
   },
   post: (publisher) => {
     return http.post('/publishers', publisher);
