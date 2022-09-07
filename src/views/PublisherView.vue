@@ -214,8 +214,8 @@ export default {
   },
 
   methods: {
-    fetchApi() {
-      publisherAccess.getAll().then((res) => {
+    async fetchApi() {
+      await publisherAccess.getAll().then((res) => {
         this.publishers = res.data.content;
         this.isLoading = false;
       });

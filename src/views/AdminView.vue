@@ -41,7 +41,7 @@
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
 
-              <v-card-text>
+              <v-card-text :class="postAdmin ? 'fitCard' : 'defautCard'">
                 <v-container>
                   <v-form class="px-1" ref="form">
                     <v-row>
@@ -118,11 +118,11 @@
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
+                          v-if="postAdmin"
                           v-model="editedItem.password"
                           label="Senha do administrador"
                           append-icon="mdi-lock-outline"
                           required
-                          counter="50"
                           :rules="[rules.required, rules.minLength]"
                         ></v-text-field>
                       </v-col>
@@ -251,8 +251,8 @@ export default {
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
       validEmail: (value) =>
-        value.match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value
         ) || 'Email inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
@@ -267,7 +267,10 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Novo usuário' : 'Editar usuário';
+      return this.editedIndex === -1 ? 'Novo admin' : 'Editar admin';
+    },
+    postAdmin() {
+      return this.editedIndex === -1 ? true : false;
     },
   },
 
@@ -283,8 +286,8 @@ export default {
   },
 
   methods: {
-    fetchApi() {
-      userAccess
+    async fetchApi() {
+      await userAccess
         .getAll()
         .then(
           (res) =>
@@ -436,5 +439,15 @@ export default {
 <style scoped>
 .dataTable {
   width: 1000px;
+}
+
+.fitCard {
+  padding-bottom: 0px !important;
+  margin-bottom: -5px !important;
+}
+
+.defaultCard {
+  padding-bottom: 20px !important;
+  margin-bottom: 0px !important;
 }
 </style>

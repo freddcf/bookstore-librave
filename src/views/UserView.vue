@@ -253,8 +253,8 @@ export default {
   },
 
   methods: {
-    fetchApi() {
-      userAccess
+    async fetchApi() {
+      await userAccess
         .getAll()
         .then(
           (res) =>

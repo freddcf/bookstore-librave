@@ -310,8 +310,8 @@ export default {
   },
 
   methods: {
-    fetchApi() {
-      bookAccess.getAll().then((res) => {
+    async fetchApi() {
+      await bookAccess.getAll().then((res) => {
         this.books = res.data.content;
         publisherAccess.getAll().then((res) => {
           this.publishers = res.data.content;
