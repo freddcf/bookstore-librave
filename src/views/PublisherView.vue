@@ -252,9 +252,9 @@ export default {
           });
         }
         this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        });
       });
     },
 
@@ -277,76 +277,81 @@ export default {
     },
 
     async insert() {
-      try {
-        await publisherAccess.post(this.editedItem).then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Editora cadastrada!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Editora cadastrada', '', 'success');
+      await publisherAccess
+        .post(this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Editora cadastrada!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Editora cadastrada', '', 'success');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao cadastrar editora', '', 'error');
+          });
         });
-      } catch (e) {
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao cadastrar editora', '', 'error');
-        });
-      }
     },
 
     async update() {
-      try {
-        await publisherAccess
-          .put(this.editedIndex, this.editedItem)
-          .then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Editora alterada!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Editora alterada', '', 'success');
+      await publisherAccess
+        .put(this.editedIndex, this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Editora alterada!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Editora alterada', '', 'success');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao editar editora', '', 'error');
+          });
         });
-      } catch (e) {
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao editar editora', '', 'error');
-        });
-      }
     },
 
     async delete() {
-      try {
-        await publisherAccess
-          .delete(this.editedIndex)
-          .then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Editora deletada!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Editora deletada', '', 'info');
+      await publisherAccess
+        .delete(this.editedIndex)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Editora deletada!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Editora deletada', '', 'info');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao deletar editora', '', 'error');
+          });
         });
-      } catch (e) {
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao deletar editora', '', 'error');
-        });
-      }
     },
   },
 };

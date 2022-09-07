@@ -209,9 +209,6 @@
           <span>Deletar</span>
         </v-tooltip>
       </template>
-      <template v-slot:no-data>
-        <h3>[Tabela vazia...]</h3>
-      </template>
     </v-data-table>
   </div>
 </template>
@@ -389,75 +386,82 @@ export default {
     },
 
     async insert() {
-      try {
-        await bookAccess.post(this.editedItem).then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Livro cadastrado!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Livro cadastrado', '', 'success');
+      await bookAccess
+        .post(this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Livro cadastrado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Livro cadastrado', '', 'success');
+          });
+        })
+        .catch((e) => {
+          console.log(e.request.response);
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao cadastrar livro', '', 'error');
+          });
         });
-      } catch (e) {
-        console.log(e.request.response);
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao cadastrar livro', '', 'error');
-        });
-      }
     },
 
     async update() {
-      try {
-        await bookAccess
-          .put(this.editedIndex, this.editedItem)
-          .then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Editora alterada!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Editora alterada', '', 'success');
+      await bookAccess
+        .put(this.editedIndex, this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Editora alterada!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Livro alterado', '', 'success');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao editar livro', '', 'error');
+          });
         });
-      } catch (e) {
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao editar editora', '', 'error');
-        });
-      }
     },
 
     async delete() {
-      try {
-        await bookAccess.delete(this.editedIndex).then(() => this.fetchApi());
-        this.$swal({
-          title: 'Sucesso',
-          text: 'Editora deletada!',
-          icon: 'success',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Editora deletada', '', 'info');
+      await bookAccess
+        .delete(this.editedIndex)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Editora deletada!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Livro deletado', '', 'info');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao deletar livro', '', 'error');
+          });
         });
-      } catch (e) {
-        this.$swal({
-          title: 'Opss...',
-          text: e.response.data.message,
-          icon: 'info',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.Toast.fire('Erro ao deletar editora', '', 'error');
-        });
-      }
     },
   },
 };
