@@ -31,6 +31,16 @@
         tile
         class="transparent c000--text"
         active-class="activated-btn"
+        to="/admin"
+      >
+        <PhUserCircleGear size="22" />
+        Admin
+      </v-btn>
+      <v-btn
+        depressed
+        tile
+        class="transparent c000--text"
+        active-class="activated-btn"
         to="/publisher"
       >
         <PhBooks size="22" />
@@ -64,6 +74,7 @@
 import {
   PhHouse,
   PhUser,
+  PhUserCircleGear,
   PhBooks,
   PhBookBookmark,
   PhNotepad,
@@ -74,6 +85,7 @@ export default {
   components: {
     PhHouse,
     PhUser,
+    PhUserCircleGear,
     PhBooks,
     PhBookBookmark,
     PhNotepad,

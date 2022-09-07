@@ -5,7 +5,7 @@
       :loading="isLoading"
       loading-text="Carregando dados... Por favor espere!"
       :headers="headers"
-      :items="users"
+      :items="admins"
       :search="search"
       :items-per-page="5"
       :sort-by="['id']"
@@ -18,7 +18,7 @@
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
           <v-toolbar-title class="font-weight-medium text-h4"
-            >Usuários</v-toolbar-title
+            >Admin</v-toolbar-title
           >
           <v-divider class="mx-6" light vertical></v-divider>
 
@@ -48,7 +48,7 @@
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-model="editedItem.name"
-                          label="Nome do usuário"
+                          label="Nome do administrador"
                           append-icon="mdi-account"
                           required
                           counter="45"
@@ -62,7 +62,7 @@
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-model="editedItem.email"
-                          label="Email do usuário"
+                          label="Email do administrador"
                           append-icon="mdi-email-outline"
                           required
                           counter="100"
@@ -77,7 +77,7 @@
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-model="editedItem.city"
-                          label="Cidade do usuário"
+                          label="Cidade do administrador"
                           append-icon="mdi-city-variant-outline"
                           required
                           counter="30"
@@ -91,7 +91,7 @@
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-model="editedItem.address"
-                          label="Endereço do usuário"
+                          label="Endereço do administrador"
                           append-icon="mdi-map-marker-outline"
                           required
                           counter="50"
@@ -100,6 +100,30 @@
                             rules.maxAddressLength,
                             rules.minLength,
                           ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-model="editedItem.username"
+                          label="Username do administrador"
+                          append-icon="mdi-card-account-details-outline"
+                          required
+                          counter="50"
+                          :rules="[
+                            rules.required,
+                            rules.maxUsernameLength,
+                            rules.minLength,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-model="editedItem.password"
+                          label="Senha do administrador"
+                          append-icon="mdi-lock-outline"
+                          required
+                          counter="50"
+                          :rules="[rules.required, rules.minLength]"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -201,7 +225,7 @@ export default {
       { text: 'Endereço', value: 'address' },
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
-    users: [],
+    admins: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
@@ -209,6 +233,8 @@ export default {
       email: '',
       city: '',
       address: '',
+      username: '',
+      password: '',
     },
     defaultItem: {
       id: 0,
@@ -216,6 +242,8 @@ export default {
       email: '',
       city: '',
       address: '',
+      username: '',
+      password: '',
     },
     rules: {
       required: (value) => !!value || 'Este campo é obrigatório.',
@@ -230,6 +258,8 @@ export default {
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>
         value.length <= 50 || 'Máximo de 50 caracteres.',
+      maxUsernameLength: (value) =>
+        value.length <= 30 || 'Máximo de 30 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
       minNum: (value) => value >= 1 || 'O valor mínimo é 1',
     },
@@ -258,10 +288,10 @@ export default {
         .getAll()
         .then(
           (res) =>
-            (res = res.data.content.filter((user) => user.role === 'USER'))
+            (res = res.data.content.filter((user) => user.role === 'ADMIN'))
         )
         .then((res) => {
-          this.users = res;
+          this.admins = res;
           this.isLoading = false;
         });
     },
@@ -323,16 +353,16 @@ export default {
 
     async insert() {
       await userAccess
-        .post(this.editedItem)
+        .postAdmin(this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Usuário cadastrado!',
+            text: 'Administrador cadastrado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Usuário cadastrado', '', 'success');
+            window.Toast.fire('Administrador cadastrado', '', 'success');
           });
         })
         .catch((e) => {
@@ -343,23 +373,23 @@ export default {
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Erro ao cadastrar usuário', '', 'error');
+            window.Toast.fire('Erro ao cadastrar administrador', '', 'error');
           });
         });
     },
 
     async update() {
       await userAccess
-        .put(this.editedIndex, this.editedItem)
+        .putAdmin(this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Usuário alterado!',
+            text: 'Administrador alterado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Usuário alterado', '', 'success');
+            window.Toast.fire('Administrador alterado', '', 'success');
           });
         })
         .catch((e) => {
@@ -369,7 +399,7 @@ export default {
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Erro ao editar usuário', '', 'error');
+            window.Toast.fire('Erro ao editar administrador', '', 'error');
           });
         });
     },
@@ -381,11 +411,11 @@ export default {
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Usuário deletado!',
+            text: 'Administrador deletado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Usuário deletado', '', 'info');
+            window.Toast.fire('Administrador deletado', '', 'info');
           });
         })
         .catch((e) => {
@@ -395,7 +425,7 @@ export default {
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Erro ao deletar usuário', '', 'error');
+            window.Toast.fire('Erro ao deletar administrador', '', 'error');
           });
         });
     },
