@@ -69,6 +69,7 @@
 import { required } from '@vuelidate/validators';
 import useValidate from '@vuelidate/core';
 import { PhArrowUUpLeft } from 'phosphor-vue';
+import { useAuthToken } from '@/stores/authToken';
 
 export default {
   name: 'LoginView',
@@ -89,6 +90,10 @@ export default {
   },
   methods: {
     submit() {
+      const store = useAuthToken();
+      store.jwtToken = 'teste';
+      console.log(store.retriveToken);
+
       this.v$.$touch();
       if (!this.v$.$error) {
         console.log('Perfect');
