@@ -37,7 +37,7 @@
               </v-btn>
             </template>
             <v-card>
-              <v-card-title>
+              <v-card-title :class="postAdmin ? 'fitCard' : 'defautCard'">
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
 
@@ -443,7 +443,7 @@ export default {
 
 .fitCard {
   padding-bottom: 0px !important;
-  margin-bottom: -5px !important;
+  margin-bottom: -10px !important;
 }
 
 .defaultCard {

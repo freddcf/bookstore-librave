@@ -376,10 +376,11 @@ export default {
 
     save() {
       if (!this.$refs.form.validate()) return;
-      this.editedItem.publisherId = this.editedItem.publisher;
       if (this.editedIndex > -1) {
+      this.editedItem.publisherId = this.editedItem.publisher.id;
         this.update();
       } else {
+        this.editedItem.publisherId = this.editedItem.publisher;
         this.insert();
       }
       this.close();
@@ -435,6 +436,7 @@ export default {
           }).then(() => {
             window.Toast.fire('Erro ao editar livro', '', 'error');
           });
+          console.log(e)
         });
     },
 
