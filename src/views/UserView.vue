@@ -43,7 +43,12 @@
 
               <v-card-text>
                 <v-container>
-                  <v-form class="px-1" ref="form">
+                  <v-form
+                    class="px-1"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field

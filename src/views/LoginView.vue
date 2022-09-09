@@ -112,7 +112,7 @@ export default {
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            store.jwtToken = (res.data.jwtToken);
+            store.jwtToken = 'Bearer ' + res.data.jwtToken;
             console.log('token: ' + store.retriveToken);
           });
         })

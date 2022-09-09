@@ -43,7 +43,12 @@
 
               <v-card-text :class="postAdmin ? 'fitCard' : 'defautCard'">
                 <v-container>
-                  <v-form class="px-1" ref="form">
+                  <v-form
+                    class="px-1"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
@@ -113,6 +118,7 @@
                             rules.required,
                             rules.maxUsernameLength,
                             rules.minLength,
+                            rules.validUsername,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -251,9 +257,10 @@ export default {
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
       validEmail: (value) =>
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-          value
+        value.match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         ) || 'Email inválido.',
+      validUsername: (value) => value.match(/^[a-z]+$/) || 'Username inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>

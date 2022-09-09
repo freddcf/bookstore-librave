@@ -2,10 +2,18 @@
   <div class="py-6 table d-flex justify-center">
     <v-data-table
       class="px-8 py-8 dataTable"
+      :loading="isLoading"
+      loading-text="Carregando dados... Por favor espere!"
       :headers="headers"
       :items="rentals"
       :search="search"
       :items-per-page="5"
+      :sort-by="['id']"
+      :footer-props="{
+        itemsPerPageOptions: [5, 10, 25, 50],
+      }"
+      update:sort-by
+      multi-sort
     >
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
@@ -24,7 +32,6 @@
                 height="40"
                 v-bind="attrs"
                 v-on="on"
-                @click="this.$refs.form.resetValidation()"
               >
                 <PhPlus size="30" weight="bold" />
               </v-btn>
@@ -36,7 +43,13 @@
 
               <v-card-text>
                 <v-container>
-                  <v-form v-if="editedIndex === -1" class="px-1" ref="form">
+                  <v-form
+                    v-if="editedIndex === -1"
+                    class="px-1"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col class="d-flex pb-0" cols="12">
                         <v-select
@@ -46,8 +59,8 @@
                           v-model="editedItem.book"
                           append-icon="mdi-book-open-page-variant"
                           label="Nome do livro"
-                          :rules="[rules.required]"
                           required
+                          :rules="[rules.required]"
                         ></v-select>
                       </v-col>
                       <v-col class="d-flex pb-0" cols="12">
@@ -55,17 +68,18 @@
                           :items="users"
                           item-text="name"
                           item-value="id"
-                          v-model="editedItem.user"
+                          v-model="editedItem.users"
                           append-icon="mdi-account"
                           label="Nome do usuário"
-                          :rules="[rules.required]"
                           required
+                          :rules="[rules.required]"
                         ></v-select>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-menu
                           v-model="modal"
                           :nudge-right="0"
+                          :close-on-content-click="false"
                           transition="slide-y-transitionn"
                           offset-y
                           min-width="auto"
@@ -83,12 +97,11 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="date"
-                            @input="
-                              modal = false;
-                              editedItem.rentalDate = formatDate;
-                            "
+                            v-model="editedItem.rentalDate"
+                            @input="modal = false"
+                            locale="pt-br"
                             color="c500"
+                            scrollable
                             :min="todayDate"
                           ></v-date-picker>
                         </v-menu>
@@ -97,6 +110,7 @@
                         <v-menu
                           v-model="modal2"
                           :nudge-right="0"
+                          :close-on-content-click="false"
                           transition="slide-y-transition"
                           offset-y
                           min-width="auto"
@@ -114,23 +128,30 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="date"
-                            @input="
-                              modal2 = false;
-                              editedItem.returnForecast = formatDate;
-                            "
+                            v-model="editedItem.returnForecast"
+                            @input="modal2 = false"
+                            locale="pt-br"
                             color="c500"
+                            scrollable
+                            :min="lastValidDate"
                           ></v-date-picker>
                         </v-menu>
                       </v-col>
                     </v-row>
                   </v-form>
-                  <v-form v-else class="px-3" ref="form">
+                  <v-form
+                    v-else
+                    class="px-3"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-menu
                           v-model="modal3"
                           :nudge-right="0"
+                          :close-on-content-click="false"
                           transition="slide-y-transition"
                           offset-y
                           min-width="auto"
@@ -148,13 +169,12 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="date"
-                            @input="
-                              modal3 = false;
-                              editedItem.returnDate = formatDate;
-                            "
+                            v-model="editedItem.returnDate"
+                            @input="modal3 = false"
+                            locale="pt-br"
                             color="c500"
-                            :min="originalFormatDate"
+                            scrollable
+                            :min="lastValidDate"
                           ></v-date-picker>
                         </v-menu>
                       </v-col>
@@ -166,24 +186,9 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="error" text @click="close"> Cancelar </v-btn>
-                <v-btn color="primary" text @click="save"> Salvar </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" persistent max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancelar</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="save" :disabled="!valid">
+                  Salvar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -248,7 +253,7 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
+        <h3>[Tabela vazia...]</h3>
       </template>
     </v-data-table>
   </div>
@@ -256,6 +261,9 @@
 
 <script>
 import { PhPlus, PhBookmarksSimple, PhTrash } from 'phosphor-vue';
+import rentalAccess from '@/services/rentalAccess';
+import bookAccess from '@/services/bookAccess';
+import userAccess from '@/services/userAccess';
 
 export default {
   name: 'RentalView',
@@ -266,17 +274,17 @@ export default {
   },
   data: () => ({
     search: '',
+    isLoading: true,
     dialog: false,
-    dialogDelete: false,
     modal: false,
     modal2: false,
     modal3: false,
+    valid: true,
     todayDate: new Date().toISOString().slice(0, 10),
-    date: '',
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Livro', value: 'book.name' },
-      { text: 'Usuário', value: 'user.name' },
+      { text: 'Usuário', value: 'users.name' },
       {
         text: 'Aluguel',
         value: 'rentalDate',
@@ -303,19 +311,23 @@ export default {
     editedIndex: -1,
     editedItem: {
       id: 0,
-      user: '',
-      book: '',
-      rentalDate: '',
-      returnForecast: '',
-      returnDate: 'Não devolvido',
-    },
-    defaultItem: {
-      id: 0,
-      user: '',
-      book: '',
+      users: null,
+      book: null,
       rentalDate: '',
       returnForecast: '',
       returnDate: '',
+      userId: 0,
+      bookId: 0,
+    },
+    defaultItem: {
+      id: 0,
+      users: null,
+      book: null,
+      rentalDate: '',
+      returnForecast: '',
+      returnDate: '',
+      userId: 0,
+      bookId: 0,
     },
     rules: {
       required: (value) => !!value || 'Este campo é obrigatório.',
@@ -326,226 +338,50 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'Novo aluguel' : 'Editar aluguel';
     },
-    formatDate() {
-      return this.date.replaceAll('-', '/');
-    },
-    originalFormatDate() {
-      return this.editedItem.rentalDate.replaceAll('/', '-');
+    lastValidDate() {
+      let min = this.editedItem.rentalDate
+        ? this.editedItem.rentalDate
+        : '2000-01-01';
+      min = new Date(min);
+      console.log(min);
+      min = min.setDate(min.getDate() - 1);
+      console.log(min);
+      min = new Date(min);
+      min = min.toISOString().slice(0, 10);
+      console.log(min);
+      return min;
     },
   },
 
   watch: {
     dialog(val) {
       val || this.close();
-      this.$refs.form.resetValidation();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
+      val || this.$refs.form.resetValidation();
     },
   },
 
   created() {
-    this.initialize();
+    this.fetchApi();
   },
 
   methods: {
-    initialize() {
-      this.rentals = [
-        {
-          id: 1,
-          user: {
-            id: 3,
-            name: 'Eclair',
-            city: 'Fortaleza',
-            email: 'ecate@gmail.com',
-            address: 'Rua Savio Freitas, 435',
-          },
-          book: {
-            id: 1,
-            name: 'Spring Security',
-            quantity: 20,
-            rentedQuantity: 9,
-            launchDate: '18/11/2020',
-            author: 'Ingred Soares',
-            publisher: 'Saraiva',
-          },
-          rentalDate: '12/05/2021',
-          returnForecast: '05/06/2021',
-          returnDate: 'Não devolvido',
-        },
-        {
-          id: 2,
-          user: {
-            id: 3,
-            name: 'Eclair',
-            city: 'Fortaleza',
-            email: 'ecate@gmail.com',
-            address: 'Rua Savio Freitas, 435',
-          },
-          book: {
-            id: 1,
-            name: 'Spring Security',
-            quantity: 20,
-            rentedQuantity: 9,
-            launchDate: '18/11/2020',
-            author: 'Ingred Soares',
-            publisher: 'Saraiva',
-          },
-          rentalDate: '2022/09/03',
-          returnForecast: '2022/10/09',
-          returnDate: 'Não devolvido',
-        },
-        {
-          id: 3,
-          user: {
-            id: 3,
-            name: 'Eclair',
-            city: 'Fortaleza',
-            email: 'ecate@gmail.com',
-            address: 'Rua Savio Freitas, 435',
-          },
-          book: {
-            id: 1,
-            name: 'Spring Security',
-            quantity: 20,
-            rentedQuantity: 9,
-            launchDate: '18/11/2020',
-            author: 'Ingred Soares',
-            publisher: 'Saraiva',
-          },
-          rentalDate: '12/05/2021',
-          returnForecast: '05/06/2021',
-          returnDate: '28/05/2021 (Com atraso)',
-        },
-        {
-          id: 4,
-          user: {
-            id: 3,
-            name: 'Eclair',
-            city: 'Fortaleza',
-            email: 'ecate@gmail.com',
-            address: 'Rua Savio Freitas, 435',
-          },
-          book: {
-            id: 1,
-            name: 'Spring Security',
-            quantity: 20,
-            rentedQuantity: 9,
-            launchDate: '18/11/2020',
-            author: 'Ingred Soares',
-            publisher: 'Saraiva',
-          },
-          rentalDate: '12/05/2021',
-          returnForecast: '05/06/2021',
-          returnDate: '28/05/2021 (No prazo)',
-        },
-        {
-          id: 5,
-          user: {
-            id: 3,
-            name: 'Eclair',
-            city: 'Fortaleza',
-            email: 'ecate@gmail.com',
-            address: 'Rua Savio Freitas, 435',
-          },
-          book: {
-            id: 1,
-            name: 'Spring Security',
-            quantity: 20,
-            rentedQuantity: 9,
-            launchDate: '18/11/2020',
-            author: 'Ingred Soares',
-            publisher: 'Saraiva',
-          },
-          rentalDate: '12/05/2021',
-          returnForecast: '05/06/2021',
-          returnDate: 'Não devolvido',
-        },
-      ];
-      this.books = [
-        {
-          id: 1,
-          name: 'Spring Security',
-          quantity: 20,
-          rentedQuantity: 9,
-          launchDate: '18/11/2020',
-          author: 'Ingred Soares',
-          publisher: 'Saraiva',
-        },
-        {
-          id: 2,
-          name: 'Java pra nois',
-          quantity: 10,
-          rentedQuantity: 11,
-          launchDate: '12/10/2019',
-          author: 'Luiz Guilherme',
-          publisher: 'Saraiva',
-        },
-        {
-          id: 3,
-          name: 'Laravel de todes',
-          quantity: 70,
-          rentedQuantity: 9,
-          launchDate: '18/11/2020',
-          author: 'Sem criatividade',
-          publisher: 'Saraiva',
-        },
-        {
-          id: 4,
-          name: 'Go Lang',
-          quantity: 100,
-          rentedQuantity: 56,
-          launchDate: '06/05/2021',
-          author: 'Edsu',
-          publisher: 'Saraiva',
-        },
-        {
-          id: 5,
-          name: 'Viu JotaEsi',
-          quantity: 67,
-          rentedQuantity: 24,
-          launchDate: '18/11/2018',
-          author: 'Pedro Edro',
-          publisher: 'Saraiva',
-        },
-      ];
-      this.users = [
-        {
-          id: 1,
-          name: 'Saraiva',
-          city: 'Fortaleza',
-          email: 'sasa@gmail.com',
-          address: 'Rua 243, 54',
-        },
-        {
-          id: 2,
-          name: 'Ice cream sandwich',
-          city: 'Fortaleza',
-          email: 'iceii@gmail.com',
-          address: 'Avenida olimpio, 100',
-        },
-        {
-          id: 3,
-          name: 'Eclair',
-          city: 'Fortaleza',
-          email: 'ecate@gmail.com',
-          address: 'Rua Savio Freitas, 435',
-        },
-        {
-          id: 4,
-          name: 'Cupcake',
-          city: 'Fortaleza',
-          email: 'cupcup@gmail.com',
-          address: 'Avenida Dom Luís 282',
-        },
-        {
-          id: 5,
-          name: 'Gingerbread',
-          city: 'Fortaleza',
-          email: 'gi@gmail.com',
-          address: 'Posto Ipiranga',
-        },
-      ];
+    async fetchApi() {
+      await rentalAccess.getAll().then((res) => {
+        this.rentals = res.data.content;
+        bookAccess.getAll().then((res) => {
+          this.books = res.data.content;
+        });
+        userAccess
+          .getAll()
+          .then(
+            (res) =>
+              (res = res.data.content.filter((user) => user.role === 'USER'))
+          )
+          .then((res) => {
+            this.users = res;
+          });
+        this.isLoading = false;
+      });
     },
 
     getReturnedBookColor(item) {
@@ -554,21 +390,41 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex = this.rentals.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.editedItem.returnDate = '';
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.rentals.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
+      this.deleteItemConfirm();
     },
 
     deleteItemConfirm() {
-      this.rentals.splice(this.editedIndex, 1);
-      this.closeDelete();
+      this.$swal({
+        title: 'Você deseja deletar esse registro?',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Deletar',
+        denyButtonText: 'Cancelar',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.delete();
+        } else if (result.isDenied) {
+          this.$swal({
+            title: 'Deleção interrompida!',
+            icon: 'info',
+            allowOutsideClick: false,
+          });
+        }
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        });
+      });
     },
 
     close() {
@@ -579,21 +435,98 @@ export default {
       });
     },
 
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     save() {
+      console.log(this.editedItem);
+      if (!this.$refs.form.validate()) return;
+      this.editedItem.bookId = this.editedItem.book.id ?? this.editedItem.book;
+      this.editedItem.userId =
+        this.editedItem.users.id ?? this.editedItem.users;
       if (this.editedIndex > -1) {
-        Object.assign(this.rentals[this.editedIndex], this.editedItem);
+        this.update();
       } else {
-        this.rentals.push(this.editedItem);
+        this.insert();
       }
       this.close();
+    },
+
+    async insert() {
+      await rentalAccess
+        .post(this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Aluguel cadastrado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Aluguel cadastrado', '', 'success');
+          });
+        })
+        .catch((e) => {
+          console.log(e.request.response);
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao cadastrar aluguel', '', 'error');
+          });
+        });
+    },
+
+    async update() {
+      await rentalAccess
+        .put(this.editedIndex, this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Livro devolvido!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Livro devolvido', '', 'success');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao editar aluguel', '', 'error');
+          });
+          console.log(e);
+        });
+    },
+
+    async delete() {
+      await rentalAccess
+        .delete(this.editedIndex)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Aluguel deletado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Aluguel deletado', '', 'info');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao deletar aluguel', '', 'error');
+          });
+        });
     },
   },
 };

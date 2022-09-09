@@ -61,7 +61,7 @@
         tile
         class="transparent c000--text"
         active-class="activated-btn"
-        to="/login"
+        to="/rental"
       >
         <PhNotepad size="22" />
         Aluguel

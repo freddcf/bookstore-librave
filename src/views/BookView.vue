@@ -105,6 +105,7 @@
                         <v-menu
                           v-model="modal"
                           :nudge-right="0"
+                          :close-on-content-click="false"
                           transition="slide-y-transition"
                           offset-y
                           min-width="auto"
@@ -124,6 +125,7 @@
                           <v-date-picker
                             v-model="editedItem.launchDate"
                             @input="modal = false"
+                            locale="pt-br"
                             color="c500"
                             :max="todayDate"
                           ></v-date-picker>
@@ -209,6 +211,9 @@
           <span>Deletar</span>
         </v-tooltip>
       </template>
+      <template v-slot:no-data>
+        <h3>[Tabela vazia...]</h3>
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -232,7 +237,6 @@ export default {
     modal: false,
     valid: true,
     todayDate: new Date().toISOString().slice(0, 10),
-    date: '',
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
@@ -258,12 +262,8 @@ export default {
       rentedQuantity: 0,
       launchDate: '',
       author: '',
-      publisher: {
-        id: 0,
-        name: '',
-        city: '',
-      },
-      publisherId: '',
+      publisher: null,
+      publisherId: 0,
     },
     defaultItem: {
       id: 0,
@@ -272,12 +272,8 @@ export default {
       rentedQuantity: 0,
       launchDate: '',
       author: '',
-      publisher: {
-        id: 0,
-        name: '',
-        city: '',
-      },
-      publisherId: '',
+      publisher: null,
+      publisherId: 0,
     },
     rules: {
       required: (value) => !!value || 'Este campo é obrigatório.',
@@ -291,11 +287,6 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'Novo Livro' : 'Editar livro';
     },
-    // loadPublisher() {
-    //   publisherAccess.getById(editedItem.publisherId).then((res) => {
-    //     this.publisher = res.data.content;
-    //   });
-    // },
   },
 
   watch: {
@@ -330,9 +321,6 @@ export default {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-      // this.editedItem.publisherId = this.publisher.id;
-
-      console.log(this.editedItem);
     },
 
     deleteItem(item) {
@@ -376,11 +364,11 @@ export default {
 
     save() {
       if (!this.$refs.form.validate()) return;
+      this.editedItem.publisherId =
+        this.editedItem.publisher.id ?? this.editedItem.publisher;
       if (this.editedIndex > -1) {
-      this.editedItem.publisherId = this.editedItem.publisher.id;
         this.update();
       } else {
-        this.editedItem.publisherId = this.editedItem.publisher;
         this.insert();
       }
       this.close();
@@ -420,7 +408,7 @@ export default {
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Editora alterada!',
+            text: 'Livro alterada!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
@@ -436,7 +424,7 @@ export default {
           }).then(() => {
             window.Toast.fire('Erro ao editar livro', '', 'error');
           });
-          console.log(e)
+          console.log(e);
         });
     },
 
@@ -447,7 +435,7 @@ export default {
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Editora deletada!',
+            text: 'Livro deletado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
