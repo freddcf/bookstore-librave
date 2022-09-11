@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import UserView from '@/views/UserView.vue';
+import AdminView from '@/views/AdminView.vue';
 import PublisherView from '@/views/PublisherView.vue';
 import BookView from '@/views/BookView.vue';
 import RentalView from '@/views/RentalView.vue';
@@ -20,6 +21,11 @@ const routes = [
     path: '/user',
     name: 'user',
     component: UserView,
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminView,
   },
   {
     path: '/publisher',

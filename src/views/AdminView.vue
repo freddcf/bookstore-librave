@@ -5,7 +5,7 @@
       :loading="isLoading"
       loading-text="Carregando dados... Por favor espere!"
       :headers="headers"
-      :items="publishers"
+      :items="admins"
       :search="search"
       :items-per-page="5"
       :sort-by="['id']"
@@ -18,7 +18,7 @@
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
           <v-toolbar-title class="font-weight-medium text-h4"
-            >Editoras</v-toolbar-title
+            >Admin</v-toolbar-title
           >
           <v-divider class="mx-6" light vertical></v-divider>
 
@@ -37,11 +37,11 @@
               </v-btn>
             </template>
             <v-card>
-              <v-card-title>
+              <v-card-title :class="postAdmin ? 'fitCard' : 'defautCard'">
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
 
-              <v-card-text>
+              <v-card-text :class="postAdmin ? 'fitCard' : 'defautCard'">
                 <v-container>
                   <v-form
                     class="px-1"
@@ -53,10 +53,10 @@
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-model="editedItem.name"
-                          label="Nome da editora"
-                          append-icon="mdi-bookshelf"
+                          label="Nome do administrador"
+                          append-icon="mdi-account"
                           required
-                          counter="25"
+                          counter="45"
                           :rules="[
                             rules.required,
                             rules.maxLength,
@@ -66,16 +66,71 @@
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
+                          v-model="editedItem.email"
+                          label="Email do administrador"
+                          append-icon="mdi-email-outline"
+                          required
+                          counter="100"
+                          :rules="[
+                            rules.required,
+                            rules.maxEmailLength,
+                            rules.minLength,
+                            rules.validEmail,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
                           v-model="editedItem.city"
-                          label="Cidade da editora"
+                          label="Cidade do administrador"
                           append-icon="mdi-city-variant-outline"
                           required
-                          counter="20"
+                          counter="30"
                           :rules="[
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
                           ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-model="editedItem.address"
+                          label="Endereço do administrador"
+                          append-icon="mdi-map-marker-outline"
+                          required
+                          counter="50"
+                          :rules="[
+                            rules.required,
+                            rules.maxAddressLength,
+                            rules.minLength,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-if="postAdmin"
+                          v-model="editedItem.username"
+                          label="Username do administrador"
+                          append-icon="mdi-card-account-details-outline"
+                          required
+                          counter="50"
+                          :rules="[
+                            rules.required,
+                            rules.maxUsernameLength,
+                            rules.minLength,
+                            rules.validUsername,
+                          ]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" class="pb-0">
+                        <v-text-field
+                          v-if="postAdmin"
+                          v-model="editedItem.password"
+                          label="Senha do administrador"
+                          append-icon="mdi-lock-outline"
+                          required
+                          :rules="[rules.required, rules.minLength]"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -158,10 +213,11 @@
 
 <script>
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
-import publisherAccess from '@/services/publisherAccess';
+import userAccess from '@/services/userAccess';
+import { useAuthToken } from '@/stores/authToken';
 
 export default {
-  name: 'PublisherView',
+  name: 'UserView',
   components: {
     PhPlus,
     PhNotePencil,
@@ -169,39 +225,64 @@ export default {
   },
   data: () => ({
     search: '',
-    isLoading: true,
     dialog: false,
+    isLoading: true,
     valid: true,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
+      { text: 'Email', value: 'email' },
       { text: 'Cidade', value: 'city' },
+      { text: 'Endereço', value: 'address' },
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
-    publishers: [],
+    admins: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
       name: '',
+      email: '',
       city: '',
+      address: '',
+      username: '',
+      password: '',
     },
     defaultItem: {
       id: 0,
       name: '',
+      email: '',
       city: '',
+      address: '',
+      username: '',
+      password: '',
     },
     rules: {
       required: (value) => !!value || 'Este campo é obrigatório.',
       maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
+      maxEmailLength: (value) =>
+        value.length <= 100 || 'Máximo de 100 caracteres.',
+      validEmail: (value) =>
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value
+        ) || 'Email inválido.',
+      validUsername: (value) => /^[a-z]+$/.test(value) || 'Username inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
+      maxAddressLength: (value) =>
+        value.length <= 50 || 'Máximo de 50 caracteres.',
+      maxUsernameLength: (value) =>
+        value.length <= 30 || 'Máximo de 30 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
+      minNum: (value) => value >= 1 || 'O valor mínimo é 1',
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Nova editora' : 'Editar editora';
+      return this.editedIndex === -1 ? 'Novo admin' : 'Editar admin';
+    },
+    postAdmin() {
+      return this.editedIndex === -1 ? true : false;
     },
   },
 
@@ -212,16 +293,27 @@ export default {
     },
   },
 
+  setup() {
+    const store = useAuthToken();
+    return { store }
+  },
+
   created() {
     this.fetchApi();
   },
 
   methods: {
     async fetchApi() {
-      await publisherAccess.getAll().then((res) => {
-        this.publishers = res.data.content;
-        this.isLoading = false;
-      });
+      await userAccess
+        .getAll()
+        .then(
+          (res) =>
+            (res = res.data.content.filter((user) => user.role === 'ADMIN'))
+        )
+        .then((res) => {
+          this.admins = res;
+          this.isLoading = false;
+        });
     },
 
     editItem(item) {
@@ -269,7 +361,7 @@ export default {
       });
     },
 
-    async save() {
+    save() {
       if (!this.$refs.form.validate()) return;
       if (this.editedIndex > -1) {
         this.update();
@@ -280,80 +372,114 @@ export default {
     },
 
     async insert() {
-      await publisherAccess
-        .post(this.editedItem)
+      await userAccess
+        .postAdmin(this.store.retriveToken, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Editora cadastrada!',
+            text: 'Administrador cadastrado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Editora cadastrada', '', 'success');
+            window.Toast.fire('Administrador cadastrado', '', 'success');
           });
         })
         .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao cadastrar editora', '', 'error');
-          });
+          console.log(e.request.response);
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao cadastrar administrador', '', 'error');
+            });
+          }
         });
     },
 
     async update() {
-      await publisherAccess
-        .put(this.editedIndex, this.editedItem)
+      await userAccess
+        .putAdmin(this.store.retriveToken, this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Editora alterada!',
+            text: 'Administrador alterado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Editora alterada', '', 'success');
+            window.Toast.fire('Administrador alterado', '', 'success');
           });
         })
         .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao editar editora', '', 'error');
-          });
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao editar administrador', '', 'error');
+            });
+          }
         });
     },
 
     async delete() {
-      await publisherAccess
-        .delete(this.editedIndex)
+      await userAccess
+        .deleteAdmin(this.store.retriveToken, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Editora deletada!',
+            text: 'Administrador deletado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Editora deletada', '', 'info');
+            window.Toast.fire('Administrador deletado', '', 'info');
           });
         })
         .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao deletar editora', '', 'error');
-          });
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao deletar administrador', '', 'error');
+            });
+          }
         });
     },
   },
@@ -362,6 +488,16 @@ export default {
 
 <style scoped>
 .dataTable {
-  width: 800px;
+  width: 1000px;
+}
+
+.fitCard {
+  padding-bottom: 0px !important;
+  margin-bottom: -10px !important;
+}
+
+.defaultCard {
+  padding-bottom: 20px !important;
+  margin-bottom: 0px !important;
 }
 </style>

@@ -2,10 +2,18 @@
   <div class="py-6 table d-flex justify-center">
     <v-data-table
       class="px-8 py-8 dataTable"
+      :loading="isLoading"
+      loading-text="Carregando dados... Por favor espere!"
       :headers="headers"
       :items="users"
       :search="search"
       :items-per-page="5"
+      :sort-by="['id']"
+      :footer-props="{
+        itemsPerPageOptions: [5, 10, 25, 50],
+      }"
+      update:sort-by
+      multi-sort
     >
       <template v-slot:top>
         <v-toolbar flat class="mb-5">
@@ -24,7 +32,6 @@
                 height="40"
                 v-bind="attrs"
                 v-on="on"
-                @click="this.$refs.form.resetValidation()"
               >
                 <PhPlus size="30" weight="bold" />
               </v-btn>
@@ -36,7 +43,12 @@
 
               <v-card-text>
                 <v-container>
-                  <v-form class="px-1" ref="form">
+                  <v-form
+                    class="px-1"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                  >
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
@@ -63,6 +75,7 @@
                             rules.required,
                             rules.maxEmailLength,
                             rules.minLength,
+                            rules.validEmail,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -102,24 +115,9 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="error" text @click="close"> Cancelar </v-btn>
-                <v-btn color="primary" text @click="save"> Salvar </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" persistent max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancelar</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="save" :disabled="!valid">
+                  Salvar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -178,7 +176,10 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
+        <h3>Tabela vazia...</h3>
+      </template>
+      <template v-slot:no-results>
+        <span>Nenhum registro encontrado!</span>
       </template>
     </v-data-table>
   </div>
@@ -186,6 +187,7 @@
 
 <script>
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
+import userAccess from '@/services/userAccess';
 
 export default {
   name: 'UserView',
@@ -197,7 +199,8 @@ export default {
   data: () => ({
     search: '',
     dialog: false,
-    dialogDelete: false,
+    isLoading: true,
+    valid: true,
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Nome', value: 'name' },
@@ -206,7 +209,7 @@ export default {
       { text: 'Endereço', value: 'address' },
       { text: 'Ações', value: 'actions', sortable: false, align: 'center' },
     ],
-    publishers: [],
+    users: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
@@ -227,12 +230,13 @@ export default {
       maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
+        validEmail: (value) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
+         || 'Email inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>
         value.length <= 50 || 'Máximo de 50 caracteres.',
-      maxUsernameLength: (value) =>
-        value.length <= 30 || 'Máximo de 30 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
       minNum: (value) => value >= 1 || 'O valor mínimo é 1',
     },
@@ -247,73 +251,63 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
-      this.$refs.form.resetValidation();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
+      val || this.$refs.form.resetValidation();
     },
   },
 
   created() {
-    this.initialize();
+    this.fetchApi();
   },
 
   methods: {
-    initialize() {
-      this.users = [
-        {
-          id: 1,
-          name: 'Saraiva',
-          city: 'Fortaleza',
-          email: 'sasa@gmail.com',
-          address: 'Rua 243, 54',
-        },
-        {
-          id: 2,
-          name: 'Ice cream sandwich',
-          city: 'Fortaleza',
-          email: 'iceii@gmail.com',
-          address: 'Avenida olimpio, 100',
-        },
-        {
-          id: 3,
-          name: 'Eclair',
-          city: 'Fortaleza',
-          email: 'ecate@gmail.com',
-          address: 'Rua Savio Freitas, 435',
-        },
-        {
-          id: 4,
-          name: 'Cupcake',
-          city: 'Fortaleza',
-          email: 'cupcup@gmail.com',
-          address: 'Avenida Dom Luís 282',
-        },
-        {
-          id: 5,
-          name: 'Gingerbread',
-          city: 'Fortaleza',
-          email: 'gi@gmail.com',
-          address: 'Posto Ipiranga',
-        },
-      ];
+    async fetchApi() {
+      await userAccess
+        .getAll()
+        .then(
+          (res) =>
+            (res = res.data.content.filter((user) => user.role === 'USER'))
+        )
+        .then((res) => {
+          this.users = res;
+          this.isLoading = false;
+        });
     },
 
     editItem(item) {
-      this.editedIndex = this.users.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.users.indexOf(item);
+      this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
+      this.deleteItemConfirm();
     },
 
     deleteItemConfirm() {
-      this.users.splice(this.editedIndex, 1);
-      this.closeDelete();
+      this.$swal({
+        title: 'Você deseja deletar esse registro?',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Deletar',
+        denyButtonText: 'Cancelar',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.delete();
+        } else if (result.isDenied) {
+          this.$swal({
+            title: 'Deleção interrompida!',
+            icon: 'info',
+            allowOutsideClick: false,
+          });
+        }
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        });
+      });
     },
 
     close() {
@@ -324,21 +318,93 @@ export default {
       });
     },
 
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     save() {
+      if (!this.$refs.form.validate()) return;
       if (this.editedIndex > -1) {
-        Object.assign(this.users[this.editedIndex], this.editedItem);
+        this.update();
       } else {
-        this.users.push(this.editedItem);
+        this.insert();
       }
       this.close();
+    },
+
+    async insert() {
+      await userAccess
+        .post(this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Usuário cadastrado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Usuário cadastrado', '', 'success');
+          });
+        })
+        .catch((e) => {
+          console.log(e.request.response);
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao cadastrar usuário', '', 'error');
+          });
+        });
+    },
+
+    async update() {
+      await userAccess
+        .put(this.editedIndex, this.editedItem)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Usuário alterado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Usuário alterado', '', 'success');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao editar usuário', '', 'error');
+          });
+        });
+    },
+
+    async delete() {
+      await userAccess
+        .delete(this.editedIndex)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Usuário deletado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Usuário deletado', '', 'info');
+          });
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao deletar usuário', '', 'error');
+          });
+        });
     },
   },
 };

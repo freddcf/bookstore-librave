@@ -14,10 +14,10 @@
         <v-col cols="12" class="form-inputs-wrapper">
           <v-text-field
             class="form-input rounded-lg mb-3"
-            v-model.trim="username"
+            v-model.trim="credentials.username"
             :error-messages="usernameErrors"
-            @input="v$.username.$touch()"
-            @blur="v$.username.$touch()"
+            @input="v$.credentials.username.$touch()"
+            @blur="v$.credentials.username.$touch()"
             solo
             label="Username"
             color="c500"
@@ -30,10 +30,10 @@
           </v-text-field>
           <v-text-field
             class="form-input rounded-lg"
-            v-model.trim="password"
+            v-model.trim="credentials.password"
             :error-messages="passwordErrors"
-            @input="v$.password.$touch()"
-            @blur="v$.password.$touch()"
+            @input="v$.credentials.password.$touch()"
+            @blur="v$.credentials.password.$touch()"
             :append-icon="showInputPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :type="showInputPassword ? 'text' : 'password'"
             solo
@@ -69,6 +69,8 @@
 import { required } from '@vuelidate/validators';
 import useValidate from '@vuelidate/core';
 import { PhArrowUUpLeft } from 'phosphor-vue';
+import userAccess from '@/services/userAccess';
+import { useAuthToken } from '@/stores/authToken';
 
 export default {
   name: 'LoginView',
@@ -76,39 +78,69 @@ export default {
     PhArrowUUpLeft,
   },
   data: () => ({
-    username: '',
-    password: '',
+    credentials: {
+      username: '',
+      password: '',
+    },
     showInputPassword: '',
   }),
   setup: () => ({ v$: useValidate() }),
   validations() {
     return {
-      username: { required },
-      password: { required },
+      credentials: {
+        username: { required },
+        password: { required },
+      },
     };
   },
   methods: {
     submit() {
-      this.v$.$touch();
+      this.v$.credentials.$touch();
       if (!this.v$.$error) {
-        console.log('Perfect');
-        console.log(this.username + ' - ' + this.password);
-        // Do action
+        this.login();
       }
+    },
+
+    async login() {
+      const store = useAuthToken();
+      await userAccess
+        .authenticate(this.credentials)
+        .then((res) => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Admin logado!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            store.jwtToken = 'Bearer ' + res.data.jwtToken;
+            console.log('token: ' + store.retriveToken);
+            this.$router.push('admin');
+          });
+        })
+        .catch(() => {
+          this.$swal({
+            title: 'Opss...',
+            text: 'Credenciais inválidas',
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Erro ao logar', '', 'error');
+          });
+        });
     },
   },
   computed: {
     usernameErrors() {
       const errors = [];
-      if (!this.v$.username.$dirty) return errors;
-      if (this.v$.username.required.$invalid)
+      if (!this.v$.credentials.username.$dirty) return errors;
+      if (this.v$.credentials.username.required.$invalid)
         errors.push('Username is required.');
       return errors;
     },
     passwordErrors() {
       const errors = [];
-      if (!this.v$.password.$dirty) return errors;
-      if (this.v$.password.required.$invalid)
+      if (!this.v$.credentials.password.$dirty) return errors;
+      if (this.v$.credentials.password.required.$invalid)
         errors.push('Password is required.');
       return errors;
     },

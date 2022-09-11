@@ -36,6 +36,10 @@ export default {
 </script>
 
 <style>
+.swal2-popup {
+  font-family: Roboto, Arial, Helvetica, sans-serif !important;
+}
+
 .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   font-size: 16px !important;
 }
