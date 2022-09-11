@@ -31,28 +31,32 @@ export default {
   components: {
     LineChartGenerator,
   },
+  props: {
+    data: Object
+  },
 
   data() {
     return {
       chartData: {
         labels: [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July',
-          'April',
-          'May',
-          'June',
-          'July',
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro',
         ],
         datasets: [
           {
-            label: 'Data One',
+            label: 'Dados mensais',
             backgroundColor: '#49c9a8',
-            data: [40, 39, 10, 40, 39, 50, 46, 40, 39, 10, 30],
+            data: Object.values(this.data),
             tension: 0.1,
           },
         ],

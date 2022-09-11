@@ -147,7 +147,10 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <h3>[Tabela vazia...]</h3>
+        <h3>Tabela vazia...</h3>
+      </template>
+      <template v-slot:no-results>
+        <span>Nenhum registro encontrado!</span>
       </template>
     </v-data-table>
   </div>

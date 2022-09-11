@@ -16,7 +16,7 @@ const pinia = createPinia();
 const Toast = Swal.mixin({
   toast: true,
   position: 'bottom-end',
-  timer: 2500,
+  timer: 2000,
   timerProgressBar: true,
   showConfirmButton: false,
   didOpen: (toast) => {

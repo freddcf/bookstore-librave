@@ -29,28 +29,29 @@ export default {
   components: {
     Radar,
   },
+  props: {
+    data: Object,
+  },
   data() {
     return {
       chartData: {
         labels: [
-          'Eating',
-          'Drinking',
-          'Sleeping',
-          'Designing',
-          'Coding',
-          'Crying'
+          'Usuários',
+          'Administradores',
+          'Editoras',
+          'Livros',
+          'Aluguéis',
         ],
         datasets: [
           {
-            label: 'My Second dataset',
-            fill: true,
-            backgroundColor: 'rgba(255,99,132,0.2)',
+            label: 'Dados gerais',
+            backgroundColor: 'rgba(255,99,132,1)',
             borderColor: 'rgba(255,99,132,1)',
             pointBackgroundColor: 'rgba(255,99,132,1)',
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: 'rgba(255,99,132,1)',
             pointHoverBorderColor: 'rgba(255,99,132,1)',
-            data: [28, 48, 40, 19, 27, 100],
+            data: Object.values(this.data),
           },
         ],
       },

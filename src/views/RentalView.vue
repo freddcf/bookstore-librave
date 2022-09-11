@@ -133,7 +133,7 @@
                             locale="pt-br"
                             color="c500"
                             scrollable
-                            :min="lastValidDate"
+                            :min="editedItem.rentalDate"
                           ></v-date-picker>
                         </v-menu>
                       </v-col>
@@ -174,7 +174,7 @@
                             locale="pt-br"
                             color="c500"
                             scrollable
-                            :min="lastValidDate"
+                            :min="editedItem.rentalDate"
                           ></v-date-picker>
                         </v-menu>
                       </v-col>
@@ -253,7 +253,10 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <h3>[Tabela vazia...]</h3>
+        <h3>Tabela vazia...</h3>
+      </template>
+      <template v-slot:no-results>
+        <span>Nenhum registro encontrado!</span>
       </template>
     </v-data-table>
   </div>
@@ -264,6 +267,7 @@ import { PhPlus, PhBookmarksSimple, PhTrash } from 'phosphor-vue';
 import rentalAccess from '@/services/rentalAccess';
 import bookAccess from '@/services/bookAccess';
 import userAccess from '@/services/userAccess';
+import { useAuthToken } from '@/stores/authToken';
 
 export default {
   name: 'RentalView',
@@ -338,19 +342,6 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'Novo aluguel' : 'Editar aluguel';
     },
-    lastValidDate() {
-      let min = this.editedItem.rentalDate
-        ? this.editedItem.rentalDate
-        : '2000-01-01';
-      min = new Date(min);
-      console.log(min);
-      min = min.setDate(min.getDate() - 1);
-      console.log(min);
-      min = new Date(min);
-      min = min.toISOString().slice(0, 10);
-      console.log(min);
-      return min;
-    },
   },
 
   watch: {
@@ -360,28 +351,45 @@ export default {
     },
   },
 
+  setup() {
+    const store = useAuthToken();
+    return { store }
+  },
+
   created() {
     this.fetchApi();
   },
 
   methods: {
     async fetchApi() {
-      await rentalAccess.getAll().then((res) => {
-        this.rentals = res.data.content;
-        bookAccess.getAll().then((res) => {
-          this.books = res.data.content;
-        });
-        userAccess
-          .getAll()
-          .then(
-            (res) =>
-              (res = res.data.content.filter((user) => user.role === 'USER'))
-          )
-          .then((res) => {
-            this.users = res;
+      await rentalAccess
+        .getAll(this.store.retriveToken)
+        .then((res) => {
+          this.rentals = res.data.content;
+          bookAccess.getAll().then((res) => {
+            this.books = res.data.content;
           });
-        this.isLoading = false;
-      });
+          userAccess
+            .getAll()
+            .then(
+              (res) =>
+                (res = res.data.content.filter((user) => user.role === 'USER'))
+            )
+            .then((res) => {
+              this.users = res;
+            });
+          this.isLoading = false;
+        })
+        .catch((e) => {
+          this.$swal({
+            title: 'Opss...',
+            text: e.response.data.message,
+            icon: 'info',
+            allowOutsideClick: false,
+          }).then(() => {
+            this.$router.push('login');
+          });
+        });
     },
 
     getReturnedBookColor(item) {
@@ -451,7 +459,7 @@ export default {
 
     async insert() {
       await rentalAccess
-        .post(this.editedItem)
+        .post(this.store.retriveToken, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -478,7 +486,7 @@ export default {
 
     async update() {
       await rentalAccess
-        .put(this.editedIndex, this.editedItem)
+        .put(this.store.retriveToken, this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -505,7 +513,7 @@ export default {
 
     async delete() {
       await rentalAccess
-        .delete(this.editedIndex)
+        .delete(this.store.retriveToken, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
