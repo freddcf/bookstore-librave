@@ -6,7 +6,9 @@
           class="card d-flex align-center justify-space-between rounded-lg pa-6"
         >
           <div class="card-content">
-            <v-card-title class="number pa-0 pb-7">{{ this.data.publishers }}</v-card-title>
+            <v-card-title class="number pa-0 pb-7">{{
+              this.data.publishers.toString().padStart(2, 0)
+            }}</v-card-title>
             <v-card-subtitle class="name pa-0">Editoras</v-card-subtitle>
           </div>
           <PhBooks size="50px" color="#49c9a8" />
@@ -15,7 +17,9 @@
           class="card d-flex align-center justify-space-between rounded-lg pa-6"
         >
           <div class="card-content">
-            <v-card-title class="number pa-0 pb-7">{{ this.data.books }}</v-card-title>
+            <v-card-title class="number pa-0 pb-7">{{
+              this.data.books.toString().padStart(2, 0)
+            }}</v-card-title>
             <v-card-subtitle class="name pa-0">Livros</v-card-subtitle>
           </div>
           <PhBookBookmark size="50px" color="#49c9a8" />
@@ -24,7 +28,9 @@
           class="card d-flex align-center justify-space-between rounded-lg pa-6"
         >
           <div class="card-content">
-            <v-card-title class="number pa-0 pb-7">{{ this.data.users }}</v-card-title>
+            <v-card-title class="number pa-0 pb-7">{{
+              this.data.users.toString().padStart(2, 0)
+            }}</v-card-title>
             <v-card-subtitle class="name pa-0">Usuários</v-card-subtitle>
           </div>
           <PhUser size="50px" color="#49c9a8" />
@@ -33,7 +39,9 @@
           class="card d-flex align-center justify-space-between rounded-lg pa-6"
         >
           <div class="card-content">
-            <v-card-title class="number pa-0 pb-7">{{ this.data.rentals }}</v-card-title>
+            <v-card-title class="number pa-0 pb-7">{{
+              this.data.rentals.toString().padStart(2, 0)
+            }}</v-card-title>
             <v-card-subtitle class="name pa-0">Aluguéis</v-card-subtitle>
           </div>
           <PhNotepad size="50px" color="#49c9a8" />
@@ -43,14 +51,30 @@
       <div class="charts">
         <v-card class="chart d-flex flex-column align-center">
           <h2>Registro de alugueis no ano vigente ({{ this.currentYear }})</h2>
-          <div id="lineChart">
-            <ChartLine v-if="exposeChart" :data="dataForMonths" class="chartComp" />
+          <div id="lineChart" :class="loaders">
+            <ChartLine
+              v-if="exposeChart"
+              :data="dataForMonths"
+              class="chartComp"
+            />
+            <half-circle-spinner
+              v-else
+              :animation-duration="1000"
+              :size="60"
+              :color="'#49C9A8'"
+            />
           </div>
         </v-card>
         <v-card class="chart d-flex flex-column align-center">
           <h2>Dados da biblioteca</h2>
-          <div id="radarChart">
+          <div id="radarChart" :class="loaders">
             <ChartRadar v-if="exposeChart" :data="data" class="chartComp" />
+            <half-circle-spinner
+              v-else
+              :animation-duration="1000"
+              :size="60"
+              :color="'rgba(255,99,132,1)'"
+            />
           </div>
         </v-card>
       </div>
@@ -60,6 +84,7 @@
 
 <script>
 import { PhUser, PhBooks, PhBookBookmark, PhNotepad } from 'phosphor-vue';
+import { HalfCircleSpinner } from 'epic-spinners';
 import ChartLine from '@/components/ChartLine.vue';
 import ChartRadar from '@/components/ChartRadar.vue';
 import publisherAccess from '@/services/publisherAccess';
@@ -76,6 +101,7 @@ export default {
     PhNotepad,
     ChartLine,
     ChartRadar,
+    HalfCircleSpinner,
   },
   data: () => ({
     exposeChart: false,
@@ -103,6 +129,11 @@ export default {
       december: 0,
     },
   }),
+  computed: {
+    loaders() {
+      return this.exposeChart ? false : 'd-flex justify-center align-center'
+    }
+  },
 
   created() {
     this.fetchData();
@@ -132,7 +163,7 @@ export default {
           this.data.rentals = res.data.content.length;
           this.rentals = res.data.content;
         });
-      this.loadMonths(this.currentYear)
+      this.loadMonths(this.currentYear);
       this.exposeChart = true;
     },
 
@@ -151,8 +182,8 @@ export default {
         november: `${currentYear}-11-01`,
         december: `${currentYear}-12-01`,
       };
-      console.log(months)
-      this.filterRentals(this.rentals, months)
+      console.log(months);
+      this.filterRentals(this.rentals, months);
     },
 
     filterRentals(rentals, months) {
