@@ -109,6 +109,7 @@
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
+                          v-if="postAdmin"
                           v-model="editedItem.username"
                           label="Username do administrador"
                           append-icon="mdi-card-account-details-outline"
@@ -213,6 +214,7 @@
 <script>
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
 import userAccess from '@/services/userAccess';
+import { useAuthToken } from '@/stores/authToken';
 
 export default {
   name: 'UserView',
@@ -260,10 +262,10 @@ export default {
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
       validEmail: (value) =>
-        value.match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value
         ) || 'Email inválido.',
-      validUsername: (value) => value.match(/^[a-z]+$/) || 'Username inválido.',
+      validUsername: (value) => /^[a-z]+$/.test(value) || 'Username inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>
@@ -289,6 +291,11 @@ export default {
       val || this.close();
       val || this.$refs.form.resetValidation();
     },
+  },
+
+  setup() {
+    const store = useAuthToken();
+    return { store }
   },
 
   created() {
@@ -366,7 +373,7 @@ export default {
 
     async insert() {
       await userAccess
-        .postAdmin(this.editedItem)
+        .postAdmin(this.store.retriveToken, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -380,20 +387,31 @@ export default {
         })
         .catch((e) => {
           console.log(e.request.response);
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao cadastrar administrador', '', 'error');
-          });
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao cadastrar administrador', '', 'error');
+            });
+          }
         });
     },
 
     async update() {
       await userAccess
-        .putAdmin(this.editedIndex, this.editedItem)
+        .putAdmin(this.store.retriveToken, this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -406,20 +424,31 @@ export default {
           });
         })
         .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao editar administrador', '', 'error');
-          });
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao editar administrador', '', 'error');
+            });
+          }
         });
     },
 
     async delete() {
       await userAccess
-        .delete(this.editedIndex)
+        .deleteAdmin(this.store.retriveToken, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -432,14 +461,25 @@ export default {
           });
         })
         .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            window.Toast.fire('Erro ao deletar administrador', '', 'error');
-          });
+          if (e.response.data.code === 401) {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.$router.push('login');
+            });
+          } else {
+            this.$swal({
+              title: 'Opss...',
+              text: e.response.data.message,
+              icon: 'info',
+              allowOutsideClick: false,
+            }).then(() => {
+              window.Toast.fire('Erro ao deletar administrador', '', 'error');
+            });
+          }
         });
     },
   },

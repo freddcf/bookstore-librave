@@ -114,7 +114,7 @@ export default {
           }).then(() => {
             store.jwtToken = 'Bearer ' + res.data.jwtToken;
             console.log('token: ' + store.retriveToken);
-            this.$router.push('rental');
+            this.$router.push('admin');
           });
         })
         .catch(() => {

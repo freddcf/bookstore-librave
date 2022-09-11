@@ -210,9 +210,17 @@
         </v-toolbar>
       </template>
 
+      <template v-slot:[`item.rentalDate`]="{ item }">
+          {{ parseDate(item.rentalDate) }}
+      </template>
+
+      <template v-slot:[`item.returnForecast`]="{ item }">
+          {{ parseDate(item.returnForecast) }}
+      </template>
+
       <template v-slot:[`item.returnDate`]="{ item }">
         <v-chip :color="getReturnedBookColor(item.returnDate)" dark>
-          {{ item.returnDate }}
+          {{ formatReturnDate(item.returnDate) }}
         </v-chip>
       </template>
 
@@ -268,6 +276,7 @@ import rentalAccess from '@/services/rentalAccess';
 import bookAccess from '@/services/bookAccess';
 import userAccess from '@/services/userAccess';
 import { useAuthToken } from '@/stores/authToken';
+import moment from 'moment'
 
 export default {
   name: 'RentalView',
@@ -395,6 +404,17 @@ export default {
     getReturnedBookColor(item) {
       if (item === 'Não devolvido') return 'c700';
       else return 'green';
+    },
+
+    parseDate(date){
+      return moment(date).format('DD-MM-yyyy')
+    },
+
+    formatReturnDate(data) {
+      if(!(/^[0-9]+/.test(data))) return data
+      let dateToPrint = this.parseDate(data.substring(0,10))
+      let textToPrint = data.substring(10, data.length)
+      return dateToPrint + textToPrint
     },
 
     editItem(item) {

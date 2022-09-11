@@ -163,6 +163,10 @@
         </v-toolbar>
       </template>
 
+      <template v-slot:[`item.launchDate`]="{ item }">
+          {{ parseDate(item.launchDate) }}
+      </template>
+
       <template v-slot:[`item.quantity`]="{ item }">
         <v-chip :color="getQuantityColor(item.quantity)" dark>
           {{ item.quantity }}
@@ -225,6 +229,7 @@
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
 import bookAccess from '@/services/bookAccess';
 import publisherAccess from '@/services/publisherAccess';
+import moment from 'moment'
 
 export default {
   name: 'BookView',
@@ -318,6 +323,10 @@ export default {
       if (value < 10) return 'red';
       else if (value < 50) return 'orange';
       else return 'green';
+    },
+
+    parseDate(date){
+      return moment(date).format('DD-MM-yyyy')
     },
 
     editItem(item) {

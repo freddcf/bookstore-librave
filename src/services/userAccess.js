@@ -17,11 +17,26 @@ export default {
     return http.delete(`/users/${id}`);
   },
 
-  postAdmin: (user) => {
-    return http.post('/users/admin', user);
+  postAdmin: (token, user) => {
+    return http.post('/users/admin', user, {
+      headers: {
+        Authorization: token,
+      },
+    });
   },
-  putAdmin: (id, user) => {
-    return http.put(`/users/admin/${id}`, user);
+  putAdmin: (token, id, user) => {
+    return http.put(`/users/admin/${id}`, user, {
+      headers: {
+        Authorization: token,
+      },
+    });
+  },
+  deleteAdmin: (token, id) => {
+    return http.delete(`/users/admin/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
   },
 
   authenticate: (user) => {

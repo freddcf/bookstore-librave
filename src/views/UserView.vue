@@ -230,10 +230,9 @@ export default {
       maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
-      validEmail: (value) =>
-        value.match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        ) || 'Email inválido.',
+        validEmail: (value) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
+         || 'Email inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>
