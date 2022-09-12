@@ -52,7 +52,7 @@
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model.trim="editedItem.name"
                           label="Nome do administrador"
                           append-icon="mdi-account"
                           required
@@ -61,12 +61,14 @@
                             rules.required,
                             rules.maxLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.email"
+                          v-model.trim="editedItem.email"
                           label="Email do administrador"
                           append-icon="mdi-email-outline"
                           required
@@ -76,12 +78,13 @@
                             rules.maxEmailLength,
                             rules.minLength,
                             rules.validEmail,
+                            rules.notEmpty,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.city"
+                          v-model.trim="editedItem.city"
                           label="Cidade do administrador"
                           append-icon="mdi-city-variant-outline"
                           required
@@ -90,12 +93,14 @@
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.address"
+                          v-model.trim="editedItem.address"
                           label="Endereço do administrador"
                           append-icon="mdi-map-marker-outline"
                           required
@@ -104,13 +109,15 @@
                             rules.required,
                             rules.maxAddressLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.basicValidationString,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-if="postAdmin"
-                          v-model="editedItem.username"
+                          v-model.trim="editedItem.username"
                           label="Username do administrador"
                           append-icon="mdi-card-account-details-outline"
                           required
@@ -120,17 +127,24 @@
                             rules.maxUsernameLength,
                             rules.minLength,
                             rules.validUsername,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
                           v-if="postAdmin"
-                          v-model="editedItem.password"
+                          v-model.trim="editedItem.password"
                           label="Senha do administrador"
                           append-icon="mdi-lock-outline"
                           required
-                          :rules="[rules.required, rules.minLength]"
+                          :rules="[
+                            rules.required,
+                            rules.minLength,
+                            rules.minPassword,
+                            rules.noSpaces,
+                            rules.basicValidationString,
+                          ]"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -274,6 +288,15 @@ export default {
         value.length <= 30 || 'Máximo de 30 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
       minNum: (value) => value >= 1 || 'O valor mínimo é 1',
+      minPassword: (value) =>
+        value.length >= 8 || 'O mínimo para senhas são 8 caracteres.',
+      notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
+      noSpaces: (value) => !/\s/.test(value) || 'Espaços não são aceitos.',
+      onlyWords: (value) =>
+        !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
+      basicValidationString: (value) =>
+        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
+        'Caracteres inválidos detectados.',
     },
   }),
 
@@ -295,7 +318,7 @@ export default {
 
   setup() {
     const store = useAuthToken();
-    return { store }
+    return { store };
   },
 
   created() {
@@ -386,7 +409,6 @@ export default {
           });
         })
         .catch((e) => {
-          console.log(e.request.response);
           if (e.response.data.code === 401) {
             this.$swal({
               title: 'Opss...',

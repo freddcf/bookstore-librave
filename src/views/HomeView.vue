@@ -91,7 +91,7 @@ import publisherAccess from '@/services/publisherAccess';
 import userAccess from '@/services/userAccess';
 import bookAccess from '@/services/bookAccess';
 import rentalAccess from '@/services/rentalAccess';
-/* eslint-disable */
+
 export default {
   name: 'Home',
   components: {
@@ -156,9 +156,7 @@ export default {
         ).length;
       });
       await rentalAccess
-        .getAll(
-          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTY2MzI3MDEzNiwiaWF0IjoxNjYyNjY1MzM2fQ.5rTru88N-Qwmnlh8Y7kUmJhfPBMAl8BG92vePgkD5aho3FWM4iPygAtUBzR90YaWa59bozVAYfPMu1ZtMDqIUw'
-        )
+        .getAll()
         .then((res) => {
           this.data.rentals = res.data.content.length;
           this.rentals = res.data.content;
@@ -182,7 +180,6 @@ export default {
         november: `${currentYear}-11-01`,
         december: `${currentYear}-12-01`,
       };
-      console.log(months);
       this.filterRentals(this.rentals, months);
     },
 

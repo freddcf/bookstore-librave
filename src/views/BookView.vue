@@ -52,7 +52,7 @@
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model.trim="editedItem.name"
                           label="Nome do livro"
                           append-icon="mdi-book-open-page-variant"
                           required
@@ -61,12 +61,14 @@
                             rules.required,
                             rules.maxLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.author"
+                          v-model.trim="editedItem.author"
                           label="Nome do autor"
                           append-icon="mdi-account-box-outline"
                           required
@@ -75,18 +77,24 @@
                             rules.required,
                             rules.maxLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.quantity"
+                          v-model.trim="editedItem.quantity"
                           type="number"
                           label="Quantidade de livros"
                           append-icon="mdi-book-plus-multiple-outline"
                           required
                           counter="20"
-                          :rules="[rules.required, rules.minNum]"
+                          :rules="[
+                            rules.required,
+                            rules.minNum,
+                            rules.notEmpty,
+                          ]"
                         ></v-text-field>
                       </v-col>
                       <v-col class="d-flex pb-0" cols="12">
@@ -164,7 +172,7 @@
       </template>
 
       <template v-slot:[`item.launchDate`]="{ item }">
-          {{ parseDate(item.launchDate) }}
+        {{ parseDate(item.launchDate) }}
       </template>
 
       <template v-slot:[`item.quantity`]="{ item }">
@@ -229,7 +237,7 @@
 import { PhPlus, PhNotePencil, PhTrash } from 'phosphor-vue';
 import bookAccess from '@/services/bookAccess';
 import publisherAccess from '@/services/publisherAccess';
-import moment from 'moment'
+import moment from 'moment';
 
 export default {
   name: 'BookView',
@@ -288,6 +296,12 @@ export default {
       maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
       minNum: (value) => value >= 1 || 'O valor mínimo é 1',
+      notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
+      onlyWords: (value) =>
+        !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
+      basicValidationString: (value) =>
+        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
+        'Caracteres inválidos detectados.',
     },
   }),
 
@@ -325,8 +339,8 @@ export default {
       else return 'green';
     },
 
-    parseDate(date){
-      return moment(date).format('DD-MM-yyyy')
+    parseDate(date) {
+      return moment(date).format('DD-MM-yyyy');
     },
 
     editItem(item) {
@@ -401,7 +415,6 @@ export default {
           });
         })
         .catch((e) => {
-          console.log(e.request.response);
           this.$swal({
             title: 'Opss...',
             text: e.response.data.message,
@@ -436,7 +449,6 @@ export default {
           }).then(() => {
             window.Toast.fire('Erro ao editar livro', '', 'error');
           });
-          console.log(e);
         });
     },
 

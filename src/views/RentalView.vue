@@ -211,11 +211,11 @@
       </template>
 
       <template v-slot:[`item.rentalDate`]="{ item }">
-          {{ parseDate(item.rentalDate) }}
+        {{ parseDate(item.rentalDate) }}
       </template>
 
       <template v-slot:[`item.returnForecast`]="{ item }">
-          {{ parseDate(item.returnForecast) }}
+        {{ parseDate(item.returnForecast) }}
       </template>
 
       <template v-slot:[`item.returnDate`]="{ item }">
@@ -276,7 +276,7 @@ import rentalAccess from '@/services/rentalAccess';
 import bookAccess from '@/services/bookAccess';
 import userAccess from '@/services/userAccess';
 import { useAuthToken } from '@/stores/authToken';
-import moment from 'moment'
+import moment from 'moment';
 
 export default {
   name: 'RentalView',
@@ -362,7 +362,7 @@ export default {
 
   setup() {
     const store = useAuthToken();
-    return { store }
+    return { store };
   },
 
   created() {
@@ -371,34 +371,22 @@ export default {
 
   methods: {
     async fetchApi() {
-      await rentalAccess
-        .getAll(this.store.retriveToken)
-        .then((res) => {
-          this.rentals = res.data.content;
-          bookAccess.getAll().then((res) => {
-            this.books = res.data.content;
-          });
-          userAccess
-            .getAll()
-            .then(
-              (res) =>
-                (res = res.data.content.filter((user) => user.role === 'USER'))
-            )
-            .then((res) => {
-              this.users = res;
-            });
-          this.isLoading = false;
-        })
-        .catch((e) => {
-          this.$swal({
-            title: 'Opss...',
-            text: e.response.data.message,
-            icon: 'info',
-            allowOutsideClick: false,
-          }).then(() => {
-            this.$router.push('login');
-          });
+      await rentalAccess.getAll().then((res) => {
+        this.rentals = res.data.content;
+        bookAccess.getAll().then((res) => {
+          this.books = res.data.content;
         });
+        userAccess
+          .getAll()
+          .then(
+            (res) =>
+              (res = res.data.content.filter((user) => user.role === 'USER'))
+          )
+          .then((res) => {
+            this.users = res;
+          });
+        this.isLoading = false;
+      });
     },
 
     getReturnedBookColor(item) {
@@ -406,15 +394,15 @@ export default {
       else return 'green';
     },
 
-    parseDate(date){
-      return moment(date).format('DD-MM-yyyy')
+    parseDate(date) {
+      return moment(date).format('DD-MM-yyyy');
     },
 
     formatReturnDate(data) {
-      if(!(/^[0-9]+/.test(data))) return data
-      let dateToPrint = this.parseDate(data.substring(0,10))
-      let textToPrint = data.substring(10, data.length)
-      return dateToPrint + textToPrint
+      if (!/^[0-9]+/.test(data)) return data;
+      let dateToPrint = this.parseDate(data.substring(0, 10));
+      let textToPrint = data.substring(10, data.length);
+      return dateToPrint + textToPrint;
     },
 
     editItem(item) {
@@ -464,7 +452,6 @@ export default {
     },
 
     save() {
-      console.log(this.editedItem);
       if (!this.$refs.form.validate()) return;
       this.editedItem.bookId = this.editedItem.book.id ?? this.editedItem.book;
       this.editedItem.userId =
@@ -492,13 +479,15 @@ export default {
           });
         })
         .catch((e) => {
-          console.log(e.request.response);
           this.$swal({
             title: 'Opss...',
             text: e.response.data.message,
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
+            if (e.response.data.code === 401) {
+              this.$router.push('login');
+            }
             window.Toast.fire('Erro ao cadastrar aluguel', '', 'error');
           });
         });
@@ -525,9 +514,11 @@ export default {
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
+            if (e.response.data.code === 401) {
+              this.$router.push('login');
+            }
             window.Toast.fire('Erro ao editar aluguel', '', 'error');
           });
-          console.log(e);
         });
     },
 
@@ -552,6 +543,9 @@ export default {
             icon: 'info',
             allowOutsideClick: false,
           }).then(() => {
+            if (e.response.data.code === 401) {
+              this.$router.push('login');
+            }
             window.Toast.fire('Erro ao deletar aluguel', '', 'error');
           });
         });

@@ -52,7 +52,7 @@
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model.trim="editedItem.name"
                           label="Nome da editora"
                           append-icon="mdi-bookshelf"
                           required
@@ -61,12 +61,14 @@
                             rules.required,
                             rules.maxLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.city"
+                          v-model.trim="editedItem.city"
                           label="Cidade da editora"
                           append-icon="mdi-city-variant-outline"
                           required
@@ -75,6 +77,8 @@
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.basicValidationString,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -196,6 +200,12 @@ export default {
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
+      notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
+      onlyWords: (value) =>
+        !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
+      basicValidationString: (value) =>
+        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
+        'Caracteres inválidos detectados.',
     },
   }),
 

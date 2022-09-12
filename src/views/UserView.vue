@@ -52,7 +52,7 @@
                     <v-row>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model.trim="editedItem.name"
                           label="Nome do usuário"
                           append-icon="mdi-account"
                           required
@@ -61,12 +61,14 @@
                             rules.required,
                             rules.maxLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.email"
+                          v-model.trim="editedItem.email"
                           label="Email do usuário"
                           append-icon="mdi-email-outline"
                           required
@@ -76,12 +78,13 @@
                             rules.maxEmailLength,
                             rules.minLength,
                             rules.validEmail,
+                            rules.notEmpty,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.city"
+                          v-model.trim="editedItem.city"
                           label="Cidade do usuário"
                           append-icon="mdi-city-variant-outline"
                           required
@@ -90,12 +93,14 @@
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.basicValidationString,
                           ]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" class="pb-0">
                         <v-text-field
-                          v-model="editedItem.address"
+                          v-model.trim="editedItem.address"
                           label="Endereço do usuário"
                           append-icon="mdi-map-marker-outline"
                           required
@@ -104,6 +109,8 @@
                             rules.required,
                             rules.maxAddressLength,
                             rules.minLength,
+                            rules.notEmpty,
+                            rules.basicValidationString,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -230,15 +237,22 @@ export default {
       maxLength: (value) => value.length <= 45 || 'Máximo de 45 caracteres.',
       maxEmailLength: (value) =>
         value.length <= 100 || 'Máximo de 100 caracteres.',
-        validEmail: (value) =>
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
-         || 'Email inválido.',
+      validEmail: (value) =>
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value
+        ) || 'Email inválido.',
       maxCityLength: (value) =>
         value.length <= 30 || 'Máximo de 30 caracteres.',
       maxAddressLength: (value) =>
         value.length <= 50 || 'Máximo de 50 caracteres.',
       minLength: (value) => value.length >= 3 || 'Mínimo de 3 caracteres.',
       minNum: (value) => value >= 1 || 'O valor mínimo é 1',
+      notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
+      onlyWords: (value) =>
+        !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
+      basicValidationString: (value) =>
+        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
+        'Caracteres inválidos detectados.',
     },
   }),
 
@@ -343,7 +357,6 @@ export default {
           });
         })
         .catch((e) => {
-          console.log(e.request.response);
           this.$swal({
             title: 'Opss...',
             text: e.response.data.message,

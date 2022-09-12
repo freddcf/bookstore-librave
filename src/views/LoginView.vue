@@ -113,7 +113,6 @@ export default {
             allowOutsideClick: false,
           }).then(() => {
             store.jwtToken = 'Bearer ' + res.data.jwtToken;
-            console.log('token: ' + store.retriveToken);
             this.$router.push('admin');
           });
         })

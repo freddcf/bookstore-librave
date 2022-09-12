@@ -1,12 +1,8 @@
 import http from '@/plugins/axios';
 
 export default {
-  getAll: (token) => {
-    return http.get('/rentals', {
-      headers: {
-        Authorization: token,
-      },
-    });
+  getAll: () => {
+    return http.get('/rentals');
   },
   getById: (token, id) => {
     return http.get(`/rentals/${id}`, {
