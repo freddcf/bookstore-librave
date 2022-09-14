@@ -55,7 +55,6 @@
                           v-model.trim="editedItem.name"
                           label="Nome da editora"
                           append-icon="mdi-bookshelf"
-                          required
                           counter="25"
                           :rules="[
                             rules.required,
@@ -71,7 +70,6 @@
                           v-model.trim="editedItem.city"
                           label="Cidade da editora"
                           append-icon="mdi-city-variant-outline"
-                          required
                           counter="20"
                           :rules="[
                             rules.required,
