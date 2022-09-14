@@ -55,7 +55,6 @@
                           v-model.trim="editedItem.name"
                           label="Nome do usuário"
                           append-icon="mdi-account"
-                          required
                           counter="45"
                           :rules="[
                             rules.required,
@@ -71,7 +70,6 @@
                           v-model.trim="editedItem.email"
                           label="Email do usuário"
                           append-icon="mdi-email-outline"
-                          required
                           counter="100"
                           :rules="[
                             rules.required,
@@ -87,14 +85,13 @@
                           v-model.trim="editedItem.city"
                           label="Cidade do usuário"
                           append-icon="mdi-city-variant-outline"
-                          required
                           counter="30"
                           :rules="[
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
                             rules.notEmpty,
-                            rules.basicValidationString,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -103,7 +100,6 @@
                           v-model.trim="editedItem.address"
                           label="Endereço do usuário"
                           append-icon="mdi-map-marker-outline"
-                          required
                           counter="50"
                           :rules="[
                             rules.required,

@@ -55,7 +55,6 @@
                           v-model.trim="editedItem.name"
                           label="Nome da editora"
                           append-icon="mdi-bookshelf"
-                          required
                           counter="25"
                           :rules="[
                             rules.required,
@@ -71,14 +70,13 @@
                           v-model.trim="editedItem.city"
                           label="Cidade da editora"
                           append-icon="mdi-city-variant-outline"
-                          required
                           counter="20"
                           :rules="[
                             rules.required,
                             rules.maxCityLength,
                             rules.minLength,
                             rules.notEmpty,
-                            rules.basicValidationString,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -203,9 +201,6 @@ export default {
       notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
       onlyWords: (value) =>
         !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
-      basicValidationString: (value) =>
-        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
-        'Caracteres inválidos detectados.',
     },
   }),
 
