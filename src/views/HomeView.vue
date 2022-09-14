@@ -66,14 +66,18 @@
           </div>
         </v-card>
         <v-card class="chart d-flex flex-column align-center">
-          <h2>Dados da biblioteca</h2>
+          <h2>Dados de aluguéis</h2>
           <div id="radarChart" :class="loaders">
-            <ChartRadar v-if="exposeChart" :data="data" class="chartComp" />
+            <ChartDoughnut
+              v-if="exposeChart"
+              :data="filteredRentalDates"
+              class="chartComp"
+            />
             <half-circle-spinner
               v-else
               :animation-duration="1000"
               :size="60"
-              :color="'rgba(255,99,132,1)'"
+              :color="'#FF7E55'"
             />
           </div>
         </v-card>
@@ -86,7 +90,7 @@
 import { PhUser, PhBooks, PhBookBookmark, PhNotepad } from 'phosphor-vue';
 import { HalfCircleSpinner } from 'epic-spinners';
 import ChartLine from '@/components/ChartLine.vue';
-import ChartRadar from '@/components/ChartRadar.vue';
+import ChartDoughnut from '@/components/ChartDoughnut.vue';
 import publisherAccess from '@/services/publisherAccess';
 import userAccess from '@/services/userAccess';
 import bookAccess from '@/services/bookAccess';
@@ -100,7 +104,7 @@ export default {
     PhBookBookmark,
     PhNotepad,
     ChartLine,
-    ChartRadar,
+    ChartDoughnut,
     HalfCircleSpinner,
   },
   data: () => ({
@@ -113,6 +117,11 @@ export default {
       rentals: 0,
     },
     rentals: [],
+    filteredRentalDates: {
+      notReturned: 0,
+      returnedInTime: 0,
+      returnedWithDelay: 0,
+    },
     currentYear: new Date().getFullYear(),
     dataForMonths: {
       january: 0,
@@ -131,8 +140,8 @@ export default {
   }),
   computed: {
     loaders() {
-      return this.exposeChart ? false : 'd-flex justify-center align-center'
-    }
+      return this.exposeChart ? false : 'd-flex justify-center align-center';
+    },
   },
 
   created() {
@@ -155,12 +164,10 @@ export default {
           (admin) => admin.role === 'ADMIN'
         ).length;
       });
-      await rentalAccess
-        .getAll()
-        .then((res) => {
-          this.data.rentals = res.data.content.length;
-          this.rentals = res.data.content;
-        });
+      await rentalAccess.getAll().then((res) => {
+        this.data.rentals = res.data.content.length;
+        this.rentals = res.data.content;
+      });
       this.loadMonths(this.currentYear);
       this.exposeChart = true;
     },
@@ -180,63 +187,98 @@ export default {
         november: `${currentYear}-11-01`,
         december: `${currentYear}-12-01`,
       };
+
       this.filterRentals(this.rentals, months);
+      this.filterRentalStates(this.rentals);
     },
 
     filterRentals(rentals, months) {
-      this.dataForMonths.january = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.january &&
+      rentals.forEach((rental) => {
+        if (
+          rental.rentalDate >= rental.january &&
           rental.rentalDate < months.february
-      ).length;
-      this.dataForMonths.february = rentals.filter(
-        (rental) =>
+        ) {
+          this.dataForMonths.january += 1;
+        }
+        if (
           rental.rentalDate >= months.february &&
           rental.rentalDate < months.march
-      ).length;
-      this.dataForMonths.march = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.march && rental.rentalDate < months.april
-      ).length;
-      this.dataForMonths.april = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.april && rental.rentalDate < months.may
-      ).length;
-      this.dataForMonths.may = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.may && rental.rentalDate < months.june
-      ).length;
-      this.dataForMonths.june = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.june && rental.rentalDate < months.july
-      ).length;
-      this.dataForMonths.july = rentals.filter(
-        (rental) =>
-          rental.rentalDate >= months.july && rental.rentalDate < months.august
-      ).length;
-      this.dataForMonths.august = rentals.filter(
-        (rental) =>
+        ) {
+          this.dataForMonths.february += 1;
+        }
+        if (
+          rental.rentalDate >= months.march &&
+          rental.rentalDate < months.april
+        ) {
+          this.dataForMonths.march += 1;
+        }
+        if (
+          rental.rentalDate >= months.april &&
+          rental.rentalDate < months.may
+        ) {
+          this.dataForMonths.april += 1;
+        }
+        if (
+          rental.rentalDate >= months.may &&
+          rental.rentalDate < months.june
+        ) {
+          this.dataForMonths.may += 1;
+        }
+        if (
+          rental.rentalDate >= months.june &&
+          rental.rentalDate < months.july
+        ) {
+          this.dataForMonths.june += 1;
+        }
+        if (
+          rental.rentalDate >= months.july &&
+          rental.rentalDate < months.august
+        ) {
+          this.dataForMonths.july += 1;
+        }
+        if (
           rental.rentalDate >= months.august &&
           rental.rentalDate < months.september
-      ).length;
-      this.dataForMonths.september = rentals.filter(
-        (rental) =>
+        ) {
+          this.dataForMonths.august += 1;
+        }
+        if (
           rental.rentalDate >= months.september &&
           rental.rentalDate < months.october
-      ).length;
-      this.dataForMonths.october = rentals.filter(
-        (rental) =>
+        ) {
+          this.dataForMonths.september += 1;
+        }
+        if (
           rental.rentalDate >= months.october &&
           rental.rentalDate < months.november
-      ).length;
-      this.dataForMonths.november = rentals.filter(
-        (rental) =>
+        ) {
+          this.dataForMonths.october += 1;
+        }
+        if (
           rental.rentalDate >= months.november &&
           rental.rentalDate < months.december
-      ).length;
-      this.dataForMonths.december = rentals.filter(
-        (rental) => rental.rentalDate >= months.december
-      ).length;
+        ) {
+          this.dataForMonths.november += 1;
+        }
+        if (rental.rentalDate >= months.december) {
+          this.dataForMonths.december += 1;
+        }
+      });
+    },
+
+    filterRentalStates(rentals) {
+      rentals.forEach((rental) => {
+        if (rental.returnDate === 'Não devolvido') {
+          this.filteredRentalDates.notReturned += 1;
+        } else {
+          if (rental.returnDate.substring(0, 10) <= rental.returnForecast) {
+            this.filteredRentalDates.returnedInTime += 1;
+          }
+          if (rental.returnDate.substring(0, 10) > rental.returnForecast) {
+            this.filteredRentalDates.returnedWithDelay += 1;
+          }
+        }
+      });
     },
   },
 };
