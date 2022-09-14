@@ -44,7 +44,6 @@
               <v-card-text>
                 <v-container>
                   <v-form
-                    v-if="editedIndex === -1"
                     class="px-1"
                     ref="form"
                     v-model="valid"
@@ -102,7 +101,7 @@
                             locale="pt-br"
                             color="c500"
                             scrollable
-                            :min="todayDate"
+                            :max="computedTodayDate"
                           ></v-date-picker>
                         </v-menu>
                       </v-col>
@@ -130,47 +129,6 @@
                           <v-date-picker
                             v-model="editedItem.returnForecast"
                             @input="modal2 = false"
-                            locale="pt-br"
-                            color="c500"
-                            scrollable
-                            :min="editedItem.rentalDate"
-                          ></v-date-picker>
-                        </v-menu>
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                  <v-form
-                    v-else
-                    class="px-3"
-                    ref="form"
-                    v-model="valid"
-                    lazy-validation
-                  >
-                    <v-row>
-                      <v-col cols="12" class="pb-0">
-                        <v-menu
-                          v-model="modal3"
-                          :nudge-right="0"
-                          :close-on-content-click="false"
-                          transition="slide-y-transition"
-                          offset-y
-                          min-width="auto"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              v-model="editedItem.returnDate"
-                              label="Data de retorno"
-                              append-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                              required
-                              :rules="[rules.required]"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            v-model="editedItem.returnDate"
-                            @input="modal3 = false"
                             locale="pt-br"
                             color="c500"
                             scrollable
@@ -225,6 +183,27 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
+        <v-tooltip
+          :disabled="item.returnDate !== 'Não devolvido'"
+          top
+          color="c800"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              outlined
+              color="c800"
+              class="tableBtn blueBtn rounded-md px-0 mr-2"
+              min-width="30"
+              height="30"
+              v-bind="attrs"
+              v-on="on"
+              @click="editItem(item, item.returnDate === 'Não devolvido')"
+            >
+              <PhNotePencil size="25" weight="bold" />
+            </v-btn>
+          </template>
+          <span>Editar</span>
+        </v-tooltip>
         <v-tooltip v-if="item.returnDate === 'Não devolvido'" top color="c700">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -235,7 +214,7 @@
               height="30"
               v-bind="attrs"
               v-on="on"
-              @click="editItem(item)"
+              @click="returnItem(item)"
             >
               <PhBookmarksSimple size="25" weight="bold" />
             </v-btn>
@@ -271,7 +250,7 @@
 </template>
 
 <script>
-import { PhPlus, PhBookmarksSimple, PhTrash } from 'phosphor-vue';
+import { PhPlus, PhBookmarksSimple, PhNotePencil, PhTrash } from 'phosphor-vue';
 import rentalAccess from '@/services/rentalAccess';
 import bookAccess from '@/services/bookAccess';
 import userAccess from '@/services/userAccess';
@@ -283,6 +262,7 @@ export default {
   components: {
     PhPlus,
     PhBookmarksSimple,
+    PhNotePencil,
     PhTrash,
   },
   data: () => ({
@@ -293,7 +273,6 @@ export default {
     modal2: false,
     modal3: false,
     valid: true,
-    todayDate: new Date().toISOString().slice(0, 10),
     headers: [
       { text: 'ID', align: 'start', value: 'id' },
       { text: 'Livro', value: 'book.name' },
@@ -351,6 +330,9 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'Novo aluguel' : 'Editar aluguel';
     },
+    computedTodayDate() {
+      return moment(new Date()).format('yyyy-MM-DD');
+    },
   },
 
   watch: {
@@ -405,17 +387,46 @@ export default {
       return dateToPrint + textToPrint;
     },
 
-    editItem(item) {
+    editItem(item, isDisaled) {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.editedItem.returnDate = '';
-      this.dialog = true;
+      if (isDisaled) this.dialog = true;
+    },
+
+    returnItem(item) {
+      this.editedIndex = item.id;
+      this.returnItemConfirm();
     },
 
     deleteItem(item) {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.deleteItemConfirm();
+    },
+
+    returnItemConfirm() {
+      this.$swal({
+        title: 'Você deseja devolver esse registro?',
+        icon: 'question',
+        showDenyButton: true,
+        confirmButtonText: 'Devolver',
+        denyButtonText: 'Cancelar',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.returnBook();
+        } else if (result.isDenied) {
+          this.$swal({
+            title: 'Retorno interrompido!',
+            icon: 'info',
+            allowOutsideClick: false,
+          });
+        }
+        this.$nextTick(() => {
+          this.editedIndex = -1;
+        });
+      });
     },
 
     deleteItemConfirm() {
@@ -500,11 +511,11 @@ export default {
         .then(() => {
           this.$swal({
             title: 'Sucesso',
-            text: 'Livro devolvido!',
+            text: 'Livro alterado!',
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            window.Toast.fire('Livro devolvido', '', 'success');
+            window.Toast.fire('Livro alterado', '', 'success');
           });
         })
         .catch((e) => {
@@ -517,8 +528,30 @@ export default {
             if (e.response.data.code === 401) {
               this.$router.push('login');
             }
-            window.Toast.fire('Erro ao editar aluguel', '', 'error');
+            window.Toast.fire('Erro ao alterar livro', '', 'error');
           });
+        });
+    },
+
+    async returnBook() {
+      await rentalAccess
+        .returnBook(this.store.retriveToken, this.editedIndex)
+        .then(() => this.fetchApi())
+        .then(() => {
+          this.$swal({
+            title: 'Sucesso',
+            text: 'Livro devolvido!',
+            icon: 'success',
+            allowOutsideClick: false,
+          }).then(() => {
+            window.Toast.fire('Livro devolvido', '', 'info');
+          });
+        })
+        .catch((e) => {
+          if (e.response.data.code === 401) {
+            this.$router.push('login');
+          }
+          window.Toast.fire('Erro ao devolver livro', '', 'error');
         });
     },
 

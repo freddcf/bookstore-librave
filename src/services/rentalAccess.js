@@ -25,6 +25,13 @@ export default {
       },
     });
   },
+  returnBook: (token, id, rental) => {
+    return http.put(`/rentals/return/${id}`, rental, {
+      headers: {
+        Authorization: token,
+      },
+    });
+  },
   delete: (token, id) => {
     return http.delete(`/rentals/${id}`, {
       headers: {
