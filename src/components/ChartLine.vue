@@ -67,6 +67,15 @@ export default {
         hoverRadius: 10,
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              font: {
+                size: 16,
+              },
+            },
+          },
+        },
       },
     };
   },
