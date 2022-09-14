@@ -78,7 +78,7 @@
                             rules.maxCityLength,
                             rules.minLength,
                             rules.notEmpty,
-                            rules.basicValidationString,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
@@ -203,9 +203,6 @@ export default {
       notEmpty: (value) => !/[ ]+$/.test(value) || 'Inválido.',
       onlyWords: (value) =>
         !/[^a-zA-ZÀ-ú'` ]+/.test(value) || 'Caracteres inválidos detectados.',
-      basicValidationString: (value) =>
-        !/[^a-zA-Z0-9À-ú'`,. ]+/.test(value) ||
-        'Caracteres inválidos detectados.',
     },
   }),
 

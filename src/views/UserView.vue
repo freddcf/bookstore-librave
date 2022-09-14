@@ -94,7 +94,7 @@
                             rules.maxCityLength,
                             rules.minLength,
                             rules.notEmpty,
-                            rules.basicValidationString,
+                            rules.onlyWords,
                           ]"
                         ></v-text-field>
                       </v-col>
