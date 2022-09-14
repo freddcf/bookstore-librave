@@ -58,7 +58,6 @@
                           v-model="editedItem.book"
                           append-icon="mdi-book-open-page-variant"
                           label="Nome do livro"
-                          required
                           :rules="[rules.required]"
                         ></v-select>
                       </v-col>
@@ -70,7 +69,6 @@
                           v-model="editedItem.users"
                           append-icon="mdi-account"
                           label="Nome do usuário"
-                          required
                           :rules="[rules.required]"
                         ></v-select>
                       </v-col>
@@ -91,7 +89,6 @@
                               readonly
                               v-bind="attrs"
                               v-on="on"
-                              required
                               :rules="[rules.required]"
                             ></v-text-field>
                           </template>
@@ -122,7 +119,6 @@
                               readonly
                               v-bind="attrs"
                               v-on="on"
-                              required
                               :rules="[rules.required]"
                             ></v-text-field>
                           </template>

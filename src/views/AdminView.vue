@@ -55,7 +55,6 @@
                           v-model.trim="editedItem.name"
                           label="Nome do administrador"
                           append-icon="mdi-account"
-                          required
                           counter="45"
                           :rules="[
                             rules.required,
@@ -71,7 +70,6 @@
                           v-model.trim="editedItem.email"
                           label="Email do administrador"
                           append-icon="mdi-email-outline"
-                          required
                           counter="100"
                           :rules="[
                             rules.required,
@@ -87,7 +85,6 @@
                           v-model.trim="editedItem.city"
                           label="Cidade do administrador"
                           append-icon="mdi-city-variant-outline"
-                          required
                           counter="30"
                           :rules="[
                             rules.required,
@@ -103,7 +100,6 @@
                           v-model.trim="editedItem.address"
                           label="Endereço do administrador"
                           append-icon="mdi-map-marker-outline"
-                          required
                           counter="50"
                           :rules="[
                             rules.required,
@@ -120,7 +116,6 @@
                           v-model.trim="editedItem.username"
                           label="Username do administrador"
                           append-icon="mdi-card-account-details-outline"
-                          required
                           counter="50"
                           :rules="[
                             rules.required,
@@ -137,7 +132,6 @@
                           v-model.trim="editedItem.password"
                           label="Senha do administrador"
                           append-icon="mdi-lock-outline"
-                          required
                           :rules="[
                             rules.required,
                             rules.minLength,

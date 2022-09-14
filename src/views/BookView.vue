@@ -55,7 +55,6 @@
                           v-model.trim="editedItem.name"
                           label="Nome do livro"
                           append-icon="mdi-book-open-page-variant"
-                          required
                           counter="25"
                           :rules="[
                             rules.required,
@@ -71,7 +70,6 @@
                           v-model.trim="editedItem.author"
                           label="Nome do autor"
                           append-icon="mdi-account-box-outline"
-                          required
                           counter="20"
                           :rules="[
                             rules.required,
@@ -88,7 +86,6 @@
                           type="number"
                           label="Quantidade de livros"
                           append-icon="mdi-book-plus-multiple-outline"
-                          required
                           counter="20"
                           :rules="[
                             rules.required,
@@ -105,7 +102,6 @@
                           v-model="editedItem.publisher"
                           append-icon="mdi-bookshelf"
                           label="Nome da editora"
-                          required
                           :rules="[rules.required]"
                         ></v-select>
                       </v-col>
@@ -126,7 +122,6 @@
                               readonly
                               v-bind="attrs"
                               v-on="on"
-                              required
                               :rules="[rules.required]"
                             ></v-text-field>
                           </template>
