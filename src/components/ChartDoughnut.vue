@@ -38,6 +38,15 @@ export default {
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: 16
+                }
+              }
+            }
+          }
       },
     };
   },
