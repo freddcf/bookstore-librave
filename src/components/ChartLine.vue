@@ -32,7 +32,7 @@ export default {
     LineChartGenerator,
   },
   props: {
-    data: Object
+    data: Object,
   },
 
   data() {
