@@ -39,14 +39,14 @@ export default {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: {
-              labels: {
-                font: {
-                  size: 16
-                }
-              }
-            }
-          }
+          legend: {
+            labels: {
+              font: {
+                size: 16,
+              },
+            },
+          },
+        },
       },
     };
   },
