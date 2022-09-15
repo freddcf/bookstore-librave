@@ -262,6 +262,7 @@ export default {
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
+          this.$refs.form.resetValidation()
         });
       });
     },
