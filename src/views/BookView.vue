@@ -11,6 +11,7 @@
       :sort-by="['id']"
       :footer-props="{
         itemsPerPageOptions: [5, 10, 25, 50],
+        itemsPerPageText:'Linhas por página'
       }"
       update:sort-by
       multi-sort
