@@ -193,7 +193,7 @@
               height="30"
               v-bind="attrs"
               v-on="on"
-              @click="editItem(item, item.returnDate === 'Não devolvido')"
+              @click="editItem(item, item.returnDate !== 'Não devolvido')"
             >
               <PhNotePencil size="25" weight="bold" />
             </v-btn>
@@ -384,10 +384,11 @@ export default {
     },
 
     editItem(item, isDisaled) {
+      if (isDisaled) return;
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.editedItem.returnDate = '';
-      if (isDisaled) this.dialog = true;
+      this.dialog = true;
     },
 
     returnItem(item) {
