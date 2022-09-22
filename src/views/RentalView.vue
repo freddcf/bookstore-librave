@@ -165,17 +165,9 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:[`item.rentalDate`]="{ item }">
-        {{ parseDate(item.rentalDate) }}
-      </template>
-
-      <template v-slot:[`item.returnForecast`]="{ item }">
-        {{ parseDate(item.returnForecast) }}
-      </template>
-
       <template v-slot:[`item.returnDate`]="{ item }">
         <v-chip :color="getReturnedBookColor(item.returnDate)" dark>
-          {{ formatReturnDate(item.returnDate) }}
+          {{ item.returnDate }}
         </v-chip>
       </template>
 
@@ -352,6 +344,11 @@ export default {
     async fetchApi() {
       await rentalAccess.getAll().then((res) => {
         this.rentals = res.data.content;
+        this.rentals.forEach((item) => {
+          item.rentalDate = this.parseDate(item.rentalDate);
+          item.returnForecast = this.parseDate(item.returnForecast);
+          item.returnDate = this.formatReturnDate(item.returnDate)
+        });
         bookAccess.getAll().then((res) => {
           this.books = res.data.content;
         });
@@ -377,6 +374,11 @@ export default {
       return moment(date).format('DD-MM-yyyy');
     },
 
+    parseDateISO(date) {
+      const [dd, mm, yyyy] = date.split('-')
+      return `${yyyy}-${mm}-${dd}`
+    },
+
     formatReturnDate(data) {
       if (!/^[0-9]+/.test(data)) return data;
       let dateToPrint = this.parseDate(data.substring(0, 10));
@@ -388,6 +390,8 @@ export default {
       if (isDisaled) return;
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
+      this.editedItem.rentalDate = this.parseDateISO(item.rentalDate);
+      this.editedItem.returnForecast = this.parseDateISO(item.returnForecast);
       this.editedItem.returnDate = '';
       this.dialog = true;
     },

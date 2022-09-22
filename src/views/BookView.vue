@@ -11,7 +11,7 @@
       :sort-by="['id']"
       :footer-props="{
         itemsPerPageOptions: [5, 10, 25, 50],
-        itemsPerPageText:'Linhas por página'
+        itemsPerPageText: 'Linhas por página',
       }"
       update:sort-by
       multi-sort
@@ -167,10 +167,6 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:[`item.launchDate`]="{ item }">
-        {{ parseDate(item.launchDate) }}
-      </template>
-
       <template v-slot:[`item.quantity`]="{ item }">
         <v-chip :color="getQuantityColor(item.quantity)" dark>
           {{ item.quantity }}
@@ -322,6 +318,9 @@ export default {
     async fetchApi() {
       await bookAccess.getAll().then((res) => {
         this.books = res.data.content;
+        this.books.forEach((item) => {
+          item.launchDate = this.parseDate(item.launchDate);
+        });
         publisherAccess.getAll().then((res) => {
           this.publishers = res.data.content;
         });
@@ -339,9 +338,15 @@ export default {
       return moment(date).format('DD-MM-yyyy');
     },
 
+    parseDateISO(date) {
+      const [dd, mm, yyyy] = date.split('-')
+      return `${yyyy}-${mm}-${dd}`
+    },
+
     editItem(item) {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
+      this.editedItem.launchDate = this.parseDateISO(item.launchDate);
       this.dialog = true;
     },
 
@@ -372,7 +377,7 @@ export default {
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
-          this.$refs.form.resetValidation()
+          this.$refs.form.resetValidation();
         });
       });
     },
