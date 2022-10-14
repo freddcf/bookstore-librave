@@ -339,4 +339,27 @@ export default {
 .chartComp {
   height: 100%;
 }
+
+@media only screen and (max-width: 1050px){
+  .dashboard {
+  margin: 20px 60px;
+  height: auto;
+}
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+@media only screen and (max-width: 600px){
+  .cards {
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+  }
+}
 </style>
