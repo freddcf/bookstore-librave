@@ -9,8 +9,8 @@
       <PhArrowUUpLeft size="40" weight="bold" />
     </v-btn>
     <div class="login d-flex flex-column justify-center align-center">
-      <h1 class="c000--text display-2 font-weight-bold mb-5">
-        Recover Password
+      <h1 class="c000--text display-2 font-weight-bold mb-5 form-title">
+        Recuperar Senha
       </h1>
       <form class="form-inputs">
         <v-col cols="12" class="form-inputs-wrapper">
@@ -67,7 +67,7 @@
             class="title"
             @click="submit"
           >
-            Restore
+            Restaurar
           </v-btn>
         </v-col>
       </form>
@@ -189,5 +189,15 @@ export default {
   position: absolute;
   top: 50px;
   left: 50px;
+}
+
+@media only screen and (max-width: 600px) {
+  .form-inputs {
+    width: 350px;
+  }
+
+  div > h1.form-title {
+    font-size: 40px !important;
+  }
 }
 </style>

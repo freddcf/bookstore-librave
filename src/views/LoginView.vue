@@ -173,4 +173,10 @@ export default {
   top: 50px;
   left: 50px;
 }
+
+@media only screen and (max-width: 600px) {
+  .form-inputs {
+    width: 350px;
+  }
+}
 </style>
