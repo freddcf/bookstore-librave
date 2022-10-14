@@ -30,12 +30,14 @@ export default {
     Navbar,
     Footer,
   },
-
-  data: () => ({}),
 };
 </script>
 
 <style>
+.table {
+  padding: 60px;
+}
+
 .swal2-popup {
   font-family: Roboto, Arial, Helvetica, sans-serif !important;
 }
