@@ -17,11 +17,14 @@
       multi-sort
     >
       <template v-slot:top>
+        <v-toolbar-title v-if="$vuetify.breakpoint.xs" class="font-weight-medium text-h4 text-center mb-4"
+            >Livros</v-toolbar-title
+          >
         <v-toolbar flat class="mb-5">
           <v-toolbar-title class="font-weight-medium text-h4"
             >Livros</v-toolbar-title
           >
-          <v-divider class="mx-6" light vertical></v-divider>
+          <v-divider v-if="!$vuetify.breakpoint.xs" class="mx-6" light vertical></v-divider>
 
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on, attrs }">
@@ -151,7 +154,7 @@
           </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-col class="d-flex" cols="12" md="5">
+          <v-col class="d-flex" cols="12" md="5" sm="5" xs="3">
             <v-text-field
               class="searchInput"
               hide-details
