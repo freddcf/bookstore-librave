@@ -35,7 +35,7 @@ export default {
 
 <style>
 .table {
-  padding: 60px;
+  padding: 20px;
 }
 
 .swal2-popup {

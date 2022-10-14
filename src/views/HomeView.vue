@@ -342,7 +342,7 @@ export default {
 
 @media only screen and (max-width: 1050px){
   .dashboard {
-  margin: 20px 60px;
+  margin: 20px 20px;
   height: auto;
 }
   .cards {
