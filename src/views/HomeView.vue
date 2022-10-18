@@ -123,20 +123,7 @@ export default {
       returnedWithDelay: 0,
     },
     currentYear: new Date().getFullYear(),
-    dataForMonths: {
-      january: 0,
-      february: 0,
-      march: 0,
-      april: 0,
-      may: 0,
-      june: 0,
-      july: 0,
-      august: 0,
-      september: 0,
-      october: 0,
-      november: 0,
-      december: 0,
-    },
+    dataForMonths: {},
   }),
   computed: {
     loaders() {
@@ -173,97 +160,30 @@ export default {
     },
 
     loadMonths(currentYear) {
-      const months = {
-        january: `${currentYear}-01-01`,
-        february: `${currentYear}-02-01`,
-        march: `${currentYear}-03-01`,
-        april: `${currentYear}-04-01`,
-        may: `${currentYear}-05-01`,
-        june: `${currentYear}-06-01`,
-        july: `${currentYear}-07-01`,
-        august: `${currentYear}-08-01`,
-        september: `${currentYear}-09-01`,
-        october: `${currentYear}-10-01`,
-        november: `${currentYear}-11-01`,
-        december: `${currentYear}-12-01`,
-      };
+      const months = {};
+      for (let i = 1; i <= 13; i++) {
+        months[i] = `${currentYear}-${i.toString().padStart(2, 0)}-01`;
+      }
 
       this.filterRentals(this.rentals, months);
       this.filterRentalStates(this.rentals);
     },
 
     filterRentals(rentals, months) {
+      for (let i = 1; i <= 12; i++) {
+        this.dataForMonths[i] = 0;
+      }
       rentals.forEach((rental) => {
-        if (
-          rental.rentalDate >= rental.january &&
-          rental.rentalDate < months.february
-        ) {
-          this.dataForMonths.january += 1;
-        }
-        if (
-          rental.rentalDate >= months.february &&
-          rental.rentalDate < months.march
-        ) {
-          this.dataForMonths.february += 1;
-        }
-        if (
-          rental.rentalDate >= months.march &&
-          rental.rentalDate < months.april
-        ) {
-          this.dataForMonths.march += 1;
-        }
-        if (
-          rental.rentalDate >= months.april &&
-          rental.rentalDate < months.may
-        ) {
-          this.dataForMonths.april += 1;
-        }
-        if (
-          rental.rentalDate >= months.may &&
-          rental.rentalDate < months.june
-        ) {
-          this.dataForMonths.may += 1;
-        }
-        if (
-          rental.rentalDate >= months.june &&
-          rental.rentalDate < months.july
-        ) {
-          this.dataForMonths.june += 1;
-        }
-        if (
-          rental.rentalDate >= months.july &&
-          rental.rentalDate < months.august
-        ) {
-          this.dataForMonths.july += 1;
-        }
-        if (
-          rental.rentalDate >= months.august &&
-          rental.rentalDate < months.september
-        ) {
-          this.dataForMonths.august += 1;
-        }
-        if (
-          rental.rentalDate >= months.september &&
-          rental.rentalDate < months.october
-        ) {
-          this.dataForMonths.september += 1;
-        }
-        if (
-          rental.rentalDate >= months.october &&
-          rental.rentalDate < months.november
-        ) {
-          this.dataForMonths.october += 1;
-        }
-        if (
-          rental.rentalDate >= months.november &&
-          rental.rentalDate < months.december
-        ) {
-          this.dataForMonths.november += 1;
-        }
-        if (rental.rentalDate >= months.december) {
-          this.dataForMonths.december += 1;
+        for (let i = 1; i <= 12; i++) {
+          if (
+            rental.rentalDate >= months[i] &&
+            rental.rentalDate < months[i + 1]
+          ) {
+            this.dataForMonths[i] += 1;
+          }
         }
       });
+      console.log(this.dataForMonths);
     },
 
     filterRentalStates(rentals) {
