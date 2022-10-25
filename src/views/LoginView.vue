@@ -84,7 +84,11 @@ export default {
     },
     showInputPassword: '',
   }),
-  setup: () => ({ v$: useValidate() }),
+  setup() {
+    const store = useAuthToken();
+    const v$ = useValidate();
+    return { store, v$ };
+  },
   validations() {
     return {
       credentials: {
@@ -102,7 +106,6 @@ export default {
     },
 
     async login() {
-      const store = useAuthToken();
       await userAccess
         .authenticate(this.credentials)
         .then((res) => {
@@ -112,7 +115,7 @@ export default {
             icon: 'success',
             allowOutsideClick: false,
           }).then(() => {
-            store.jwtToken = 'Bearer ' + res.data.jwtToken;
+            this.store.setToken(res.data.jwtToken);
             this.$router.push('admin');
           });
         })

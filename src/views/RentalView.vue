@@ -11,19 +11,27 @@
       :sort-by="['id']"
       :footer-props="{
         itemsPerPageOptions: [5, 10, 25, 50],
-        itemsPerPageText:'Linhas por página'
+        itemsPerPageText: 'Linhas por página',
       }"
       update:sort-by
       multi-sort
     >
       <template v-slot:top>
-        <v-toolbar-title v-if="$vuetify.breakpoint.xs" class="font-weight-medium text-h4 text-center mb-4"
-          >Aluguel</v-toolbar-title>
+        <v-toolbar-title
+          v-if="$vuetify.breakpoint.xs"
+          class="font-weight-medium text-h4 text-center mb-4"
+          >Aluguel</v-toolbar-title
+        >
         <v-toolbar flat class="mb-5">
           <v-toolbar-title class="font-weight-medium text-h4"
             >Aluguel</v-toolbar-title
           >
-          <v-divider v-if="!$vuetify.breakpoint.xs" class="mx-6" light vertical></v-divider>
+          <v-divider
+            v-if="!$vuetify.breakpoint.xs"
+            class="mx-6"
+            light
+            vertical
+          ></v-divider>
 
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on, attrs }">
@@ -349,7 +357,7 @@ export default {
         this.rentals.forEach((item) => {
           item.rentalDate = this.parseDate(item.rentalDate);
           item.returnForecast = this.parseDate(item.returnForecast);
-          item.returnDate = this.formatReturnDate(item.returnDate)
+          item.returnDate = this.formatReturnDate(item.returnDate);
         });
         bookAccess.getAll().then((res) => {
           this.books = res.data.content;
@@ -377,8 +385,8 @@ export default {
     },
 
     parseDateISO(date) {
-      const [dd, mm, yyyy] = date.split('-')
-      return `${yyyy}-${mm}-${dd}`
+      const [dd, mm, yyyy] = date.split('-');
+      return `${yyyy}-${mm}-${dd}`;
     },
 
     formatReturnDate(data) {
@@ -454,7 +462,7 @@ export default {
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
-          this.$refs.form.resetValidation()
+          if (this.$refs.form) this.$refs.form.resetValidation();
         });
       });
     },
@@ -482,7 +490,7 @@ export default {
 
     async insert() {
       await rentalAccess
-        .post(this.store.retriveToken, this.editedItem)
+        .post(this.store.getToken.value, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -511,7 +519,7 @@ export default {
 
     async update() {
       await rentalAccess
-        .put(this.store.retriveToken, this.editedIndex, this.editedItem)
+        .put(this.store.getToken.value, this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -540,7 +548,7 @@ export default {
 
     async returnBook() {
       await rentalAccess
-        .returnBook(this.store.retriveToken, this.editedIndex)
+        .returnBook(this.store.getToken.value, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -562,7 +570,7 @@ export default {
 
     async delete() {
       await rentalAccess
-        .delete(this.store.retriveToken, this.editedIndex)
+        .delete(this.store.getToken.value, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({

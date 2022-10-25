@@ -183,7 +183,6 @@ export default {
           }
         }
       });
-      console.log(this.dataForMonths);
     },
 
     filterRentalStates(rentals) {
@@ -260,11 +259,11 @@ export default {
   height: 100%;
 }
 
-@media only screen and (max-width: 1050px){
+@media only screen and (max-width: 1050px) {
   .dashboard {
-  margin: 20px 20px;
-  height: auto;
-}
+    margin: 20px 20px;
+    height: auto;
+  }
   .cards {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -276,7 +275,7 @@ export default {
   }
 }
 
-@media only screen and (max-width: 600px){
+@media only screen and (max-width: 600px) {
   .cards {
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: repeat(1, 1fr);

@@ -11,19 +11,27 @@
       :sort-by="['id']"
       :footer-props="{
         itemsPerPageOptions: [5, 10, 25, 50],
-        itemsPerPageText:'Linhas por página'
+        itemsPerPageText: 'Linhas por página',
       }"
       update:sort-by
       multi-sort
     >
       <template v-slot:top>
-        <v-toolbar-title v-if="$vuetify.breakpoint.xs" class="font-weight-medium text-h4 text-center mb-4"
-          >Admin</v-toolbar-title>
+        <v-toolbar-title
+          v-if="$vuetify.breakpoint.xs"
+          class="font-weight-medium text-h4 text-center mb-4"
+          >Admin</v-toolbar-title
+        >
         <v-toolbar flat class="mb-5">
           <v-toolbar-title class="font-weight-medium text-h4"
             >Admin</v-toolbar-title
           >
-          <v-divider v-if="!$vuetify.breakpoint.xs" class="mx-6" light vertical></v-divider>
+          <v-divider
+            v-if="!$vuetify.breakpoint.xs"
+            class="mx-6"
+            light
+            vertical
+          ></v-divider>
 
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on, attrs }">
@@ -369,7 +377,7 @@ export default {
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
-          this.$refs.form.resetValidation()
+          this.$refs.form.resetValidation();
         });
       });
     },
@@ -394,7 +402,7 @@ export default {
 
     async insert() {
       await userAccess
-        .postAdmin(this.store.retriveToken, this.editedItem)
+        .postAdmin(this.store.getToken.value, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -431,7 +439,7 @@ export default {
 
     async update() {
       await userAccess
-        .putAdmin(this.store.retriveToken, this.editedIndex, this.editedItem)
+        .putAdmin(this.store.getToken.value, this.editedIndex, this.editedItem)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
@@ -468,7 +476,7 @@ export default {
 
     async delete() {
       await userAccess
-        .deleteAdmin(this.store.retriveToken, this.editedIndex)
+        .deleteAdmin(this.store.getToken.value, this.editedIndex)
         .then(() => this.fetchApi())
         .then(() => {
           this.$swal({
