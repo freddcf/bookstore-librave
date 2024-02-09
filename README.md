@@ -4,9 +4,7 @@
 
 <p align="center">
     <img alt="Plataforma" src="https://img.shields.io/static/v1?label=plataforma&message=PC&labelColor=1D3245&color=02AF8E">
-    <a aria-label="Completado" href="https://nextlevelweek.com">
-        <img alt="feedget" src="https://img.shields.io/badge/librave-v1.0-333?labelColor=1D3245&color=02AF8E"></img>
-    </a>
+    <img alt="versao" src="https://img.shields.io/badge/librave-v1.0-333?labelColor=1D3245&color=02AF8E"></img>
     <img alt="Tamanho do repositório" src="https://img.shields.io/github/repo-size/freddcf/feedget?labelColor=1D3245&color=49C9A8"">
 </p>
 
